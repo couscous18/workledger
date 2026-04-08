@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/workledger/workledger/main/schemas/workledger.schema.json",
+  "$id": "https://raw.githubusercontent.com/couscous18/workledger/main/schemas/workledger.schema.json",
   "title": "workledger core schema",
   "type": "object",
   "description": "Combined schema definitions for core V1 workledger objects.",

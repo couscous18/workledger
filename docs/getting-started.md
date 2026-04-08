@@ -5,9 +5,13 @@
 ## Install
 
 ```bash
-pip install workledger
-wl init --project-dir .workledger
+git clone https://github.com/couscous18/workledger.git
+cd workledger
+uv sync --all-extras
+uv run wl init --project-dir .workledger
 ```
+
+> PyPI publishing is coming. For now, install from source.
 
 ## Quickstart: Agent Work Ledger
 

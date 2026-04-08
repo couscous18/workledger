@@ -11,9 +11,10 @@
 If you only try one thing, run:
 
 ```bash
-pip install workledger
-wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-wl compare-costs --from-project .workledger/agent-cost
+git clone https://github.com/couscous18/workledger.git && cd workledger
+uv sync --all-extras
+uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
+uv run wl compare-costs --from-project .workledger/agent-cost
 ```
 
 Use it when you already have traces and want:

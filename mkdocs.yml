@@ -1,8 +1,8 @@
 site_name: workledger
-site_url: https://workledger.github.io/workledger/
+site_url: https://couscous18.github.io/workledger/
 site_description: Agent work ledger for AI systems
-repo_url: https://github.com/workledger/workledger
-repo_name: workledger/workledger
+repo_url: https://github.com/couscous18/workledger
+repo_name: couscous18/workledger
 edit_uri: edit/main/docs/
 
 theme:
@@ -69,4 +69,4 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/workledger/workledger
+      link: https://github.com/couscous18/workledger

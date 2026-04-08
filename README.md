@@ -1,10 +1,9 @@
 # workledger
 
-[![CI](https://github.com/workledger/workledger/actions/workflows/ci.yml/badge.svg)](https://github.com/workledger/workledger/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/workledger.svg)](https://pypi.org/project/workledger/)
+[![CI](https://github.com/couscous18/workledger/actions/workflows/ci.yml/badge.svg)](https://github.com/couscous18/workledger/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://workledger.github.io/workledger/)
+[![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://couscous18.github.io/workledger/)
 
 `workledger` is an agent work ledger for AI systems.
 
@@ -18,15 +17,28 @@ AI traces are great at capturing execution, but teams still need a way to answer
 
 `workledger` introduces `WorkUnit` as the missing layer between span-level telemetry and business or governance decisions. Feed in OpenTelemetry, OpenInference, JSONL, or SDK events. Get back reviewable units of work with cost, evidence, policy context, and transparent economics.
 
+## Who This Is For
+
+- Teams running AI agents that produce execution traces (OpenTelemetry, OpenInference, JSONL)
+- Engineers who need to answer "what work happened?" not just "what code ran?"
+- Finance and governance teams that need policy-backed classification of AI work
+
+## Who This Is Not For
+
+- Generic application analytics or APM replacement
+- A tracing backend — workledger consumes traces, it doesn't collect them
+- Production-ready systems (this is alpha, expect breaking changes)
+
 ```bash
-pip install workledger
-wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-wl compare-costs --from-project .workledger/agent-cost
+git clone https://github.com/couscous18/workledger.git && cd workledger
+uv sync --all-extras
+uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
+uv run wl compare-costs --from-project .workledger/agent-cost
 ```
 
 ![workledger before and after](docs/assets/workledger-before-after.svg)
 
-[See Proof Artifact](docs/assets/builder-demo-report.html) · [Builder Demo](docs/builder-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://workledger.github.io/workledger/)
+[See Proof Artifact](docs/assets/builder-demo-report.html) · [Builder Demo](docs/builder-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
 
 ## The Missing Primitive
 
@@ -67,23 +79,18 @@ That lets builders move from "what executed?" to questions like:
 
 ## 60-Second Quickstart
 
-### From PyPI
+### Install from source
 
 ```bash
-pip install workledger
-wl init --project-dir .workledger
-wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-wl compare-costs --from-project .workledger/agent-cost
-```
-
-### From source
-
-```bash
+git clone https://github.com/couscous18/workledger.git
+cd workledger
 uv sync --all-extras
 uv run wl init --project-dir .workledger
 uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
 uv run wl compare-costs --from-project .workledger/agent-cost
 ```
+
+> PyPI publishing is coming. For now, install from source.
 
 ### What You Should See
 
@@ -101,6 +108,20 @@ If you want the multi-team demo set after the flagship agent path:
 wl demo all --project-dir .workledger/demo --open-report
 wl compare-costs --from-project .workledger/demo
 ```
+
+### Bring Your Own Traces (3 Minutes)
+
+Already have OpenTelemetry JSON exports? Try this:
+
+```bash
+uv run wl init --project-dir .workledger/my-traces
+uv run wl ingest .workledger/my-traces your-traces.json --format otel
+uv run wl rollup .workledger/my-traces
+uv run wl classify .workledger/my-traces
+uv run wl report .workledger/my-traces --format html --open
+```
+
+Supported formats: `otel`, `openinference`, `jsonl`, `cloudevents`, `sdk`
 
 ### Tiny Python Example
 
