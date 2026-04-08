@@ -1,0 +1,24 @@
+policy_pack_id: tax_r_and_d_v1
+version: 0.1.0
+basis: tax_r_and_d_v1
+title: Tax R&D Example
+description: Example tax-oriented policy pack for surfacing work that could be relevant to R&D studies.
+default_work_category: general_admin
+default_policy_outcome: review_required
+rules:
+  - id: tax_rd_candidate
+    priority: 100
+    when:
+      any:
+        - feature: labels
+          op: overlaps
+          value: ["experiment", "prototype", "feature"]
+        - feature: kind
+          op: eq
+          value: software_delivery
+    decision:
+      work_category: research_and_development
+      policy_outcome: review_required
+      confidence: 0.7
+      requires_review: true
+    explanation: Software development or experimental signals may be relevant to an R&D study but need tax review.

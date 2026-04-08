@@ -1,0 +1,62 @@
+policy_pack_id: software_capex_review_v1
+version: 1.0.0
+basis: software_capex_review_v1
+title: Software Capex Review
+description: Conservative capex-oriented policy pack for software work that distinguishes maintenance from capitalizable development candidates.
+default_work_category: unknown
+default_policy_outcome: review_required
+rules:
+  - id: maintenance_hotfix
+    priority: 100
+    when:
+      any:
+        - feature: git.issue_labels
+          op: overlaps
+          value: ["bug", "incident", "maintenance"]
+        - feature: git.branch
+          op: contains
+          value: fix/
+        - feature: git.deployment_target
+          op: eq
+          value: production
+    decision:
+      work_category: maintenance_bugfix
+      policy_outcome: maintenance_non_capitalizable
+      cost_category: software_maintenance
+      confidence: 0.96
+    explanation: Maintenance and production hotfix signals indicate non-capitalizable software maintenance.
+
+  - id: internal_use_software
+    priority: 90
+    when:
+      any:
+        - feature: git.repository
+          op: contains
+          value: internal
+        - feature: labels
+          op: overlaps
+          value: ["internal-tool", "ops"]
+    decision:
+      work_category: internal_use_software
+      policy_outcome: capitalize_candidate
+      cost_category: internal_software
+      confidence: 0.84
+      requires_review: true
+    explanation: Internal-use software is a capitalization candidate but should remain review-required in V1.
+
+  - id: product_feature
+    priority: 80
+    when:
+      any:
+        - feature: labels
+          op: overlaps
+          value: ["feature", "product"]
+        - feature: objective
+          op: contains
+          value: external product
+    decision:
+      work_category: external_product_development
+      policy_outcome: capitalize_candidate
+      cost_category: product_development
+      confidence: 0.91
+    explanation: New product feature delivery is a software development activity that merits capitalization review.

@@ -1,0 +1,102 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "workledger"
+version = "0.1.0"
+description = "Turn AI traces into understandable units of work."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "workledger maintainers" },
+]
+keywords = [
+  "ai",
+  "ai-agents",
+  "work-intelligence",
+  "cost-attribution",
+  "observability",
+  "opentelemetry",
+  "llmops",
+  "duckdb",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries",
+]
+
+dependencies = [
+  "cloudevents>=1.11.0",
+  "duckdb>=1.1.3",
+  "fastapi>=0.115.0",
+  "httpx>=0.28.0",
+  "orjson>=3.10.0",
+  "polars>=1.12.0",
+  "pydantic>=2.9.0",
+  "pydantic-settings>=2.5.2",
+  "pyyaml>=6.0.2",
+  "rich>=13.9.0",
+  "typer>=0.12.5",
+  "uvicorn>=0.32.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/workledger/workledger"
+Documentation = "https://workledger.github.io/workledger/"
+Repository = "https://github.com/workledger/workledger"
+Issues = "https://github.com/workledger/workledger/issues"
+
+[project.optional-dependencies]
+dev = [
+  "hypothesis>=6.112.0",
+  "mypy>=1.13.0",
+  "pre-commit>=4.0.1",
+  "pytest>=8.3.0",
+  "pytest-cov>=6.0.0",
+  "ruff>=0.7.0",
+]
+docs = [
+  "mkdocs-material>=9.5.0",
+  "mkdocstrings[python]>=0.26.0",
+]
+
+[project.scripts]
+wl = "workledger.cli:app"
+workledger-server = "workledger_server.app:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/workledger", "src/workledger_observe", "src/workledger_server"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["hf/software-capex-review/notebook/*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM", "C4"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_configs = true
+plugins = []
+
+[[tool.mypy.overrides]]
+module = ["yaml"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q"
+testpaths = ["tests"]

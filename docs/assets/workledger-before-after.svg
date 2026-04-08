@@ -1,0 +1,84 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="80" y1="40" x2="1120" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7F3EA"/>
+      <stop offset="1" stop-color="#E9F3F0"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="140" y1="140" x2="540" y2="620" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFDF8"/>
+      <stop offset="1" stop-color="#F5EFE2"/>
+    </linearGradient>
+    <linearGradient id="panel2" x1="660" y1="140" x2="1060" y2="620" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FFFD"/>
+      <stop offset="1" stop-color="#E5F4EF"/>
+    </linearGradient>
+    <filter id="shadow" x="80" y="88" width="1040" height="584" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="18"/>
+      <feGaussianBlur stdDeviation="24"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.118 0 0 0 0 0.141 0 0 0 0 0.188 0 0 0 0.12 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="760" rx="32" fill="url(#bg)"/>
+  <g filter="url(#shadow)">
+    <rect x="120" y="120" width="420" height="520" rx="28" fill="url(#panel)"/>
+    <rect x="660" y="120" width="420" height="520" rx="28" fill="url(#panel2)"/>
+  </g>
+
+  <text x="120" y="72" fill="#10212B" font-size="20" font-family="Georgia, serif" letter-spacing="2">WORKLEDGER BUILDER VIEW</text>
+  <text x="120" y="108" fill="#10212B" font-size="42" font-family="Georgia, serif" font-weight="700">14 noisy spans in, 3 reviewable work units out.</text>
+  <text x="120" y="142" fill="#51616F" font-size="20" font-family="Georgia, serif">Observability shows the run. workledger shows the work.</text>
+
+  <text x="156" y="176" fill="#7A5C2D" font-size="18" font-family="Arial, sans-serif" font-weight="700" letter-spacing="1">RAW TRACE SPANS</text>
+  <text x="156" y="206" fill="#21313B" font-size="32" font-family="Georgia, serif" font-weight="700">14 spans</text>
+  <text x="156" y="232" fill="#6A7783" font-size="16" font-family="Arial, sans-serif">retrievers, tools, LLM calls, review steps, guardrails</text>
+
+  <rect x="156" y="268" width="348" height="54" rx="16" fill="#FFFFFF" stroke="#E6DCCB"/>
+  <circle cx="186" cy="295" r="8" fill="#D97706"/>
+  <text x="206" y="300" fill="#21313B" font-size="18" font-family="Arial, sans-serif">Resolve incident ticket BUG-142</text>
+  <text x="420" y="300" fill="#7B8793" font-size="14" font-family="Arial, sans-serif">6 spans</text>
+
+  <rect x="156" y="336" width="348" height="54" rx="16" fill="#FFFFFF" stroke="#E6DCCB"/>
+  <circle cx="186" cy="363" r="8" fill="#0F766E"/>
+  <text x="206" y="368" fill="#21313B" font-size="18" font-family="Arial, sans-serif">Build workflow orchestration dashboard</text>
+  <text x="420" y="368" fill="#7B8793" font-size="14" font-family="Arial, sans-serif">5 spans</text>
+
+  <rect x="156" y="404" width="348" height="54" rx="16" fill="#FFFFFF" stroke="#E6DCCB"/>
+  <circle cx="186" cy="431" r="8" fill="#2563EB"/>
+  <text x="206" y="436" fill="#21313B" font-size="18" font-family="Arial, sans-serif">Automate release checklist workflow</text>
+  <text x="420" y="436" fill="#7B8793" font-size="14" font-family="Arial, sans-serif">3 spans</text>
+
+  <text x="156" y="494" fill="#7B8793" font-size="16" font-family="Arial, sans-serif">Span-level tools tell you token counts, latency, and failures.</text>
+  <text x="156" y="520" fill="#7B8793" font-size="16" font-family="Arial, sans-serif">They do not tell you which work was maintenance, product, or review-worthy.</text>
+
+  <path d="M565 380H635" stroke="#0F766E" stroke-width="8" stroke-linecap="round"/>
+  <path d="M615 356L642 380L615 404" stroke="#0F766E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="696" y="176" fill="#0F766E" font-size="18" font-family="Arial, sans-serif" font-weight="700" letter-spacing="1">WORK UNITS + CLASSIFICATIONS</text>
+  <text x="696" y="206" fill="#10212B" font-size="32" font-family="Georgia, serif" font-weight="700">3 work units</text>
+  <text x="696" y="232" fill="#5A6B75" font-size="16" font-family="Arial, sans-serif">cost, evidence, confidence, review queue, and policy outcomes</text>
+
+  <rect x="696" y="268" width="348" height="86" rx="18" fill="#FFFFFF" stroke="#CFE8DF"/>
+  <text x="718" y="296" fill="#10212B" font-size="20" font-family="Georgia, serif" font-weight="700">Patch customer API timeout regression</text>
+  <text x="718" y="320" fill="#7A5C2D" font-size="15" font-family="Arial, sans-serif">maintenance_bugfix</text>
+  <text x="718" y="342" fill="#6A7783" font-size="15" font-family="Arial, sans-serif">maintenance_non_capitalizable · $0.0483 · human reviewed</text>
+
+  <rect x="696" y="368" width="348" height="86" rx="18" fill="#FFFFFF" stroke="#CFE8DF"/>
+  <text x="718" y="396" fill="#10212B" font-size="20" font-family="Georgia, serif" font-weight="700">Implement orchestration dashboard for customers</text>
+  <text x="718" y="420" fill="#0F766E" font-size="15" font-family="Arial, sans-serif">external_product_development</text>
+  <text x="718" y="442" fill="#6A7783" font-size="15" font-family="Arial, sans-serif">capitalize_candidate · $0.0828 · 1.67x compression</text>
+
+  <rect x="696" y="468" width="348" height="112" rx="18" fill="#FFFFFF" stroke="#CFE8DF"/>
+  <text x="718" y="496" fill="#10212B" font-size="20" font-family="Georgia, serif" font-weight="700">Automate release checklist workflow</text>
+  <text x="718" y="520" fill="#2563EB" font-size="15" font-family="Arial, sans-serif">internal_use_software</text>
+  <text x="718" y="542" fill="#6A7783" font-size="15" font-family="Arial, sans-serif">capitalize_candidate · $0.0471 · confidence 0.77</text>
+  <rect x="718" y="554" width="128" height="18" rx="9" fill="#FCE7F3"/>
+  <text x="731" y="567" fill="#9D174D" font-size="12" font-family="Arial, sans-serif" font-weight="700">PENDING REVIEW</text>
+
+  <rect x="120" y="668" width="960" height="56" rx="18" fill="#10212B"/>
+  <text x="154" y="702" fill="#F8FBFA" font-size="20" font-family="Georgia, serif">The point is not more telemetry. The point is a smaller, more useful unit of truth.</text>
+</svg>

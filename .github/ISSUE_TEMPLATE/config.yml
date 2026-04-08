@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Policy
+    url: https://github.com/workledger/workledger/security/policy
+    about: Use GitHub private vulnerability reporting when available, or follow the repository security policy
+  - name: Question or Discussion
+    url: https://github.com/workledger/workledger/discussions
+    about: Ask questions and discuss ideas in GitHub Discussions

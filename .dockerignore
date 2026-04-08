@@ -1,0 +1,13 @@
+.git
+.github
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.venv
+.workledger
+dist
+build
+docs/assets
+hf/software-capex-review/notebook
+__pycache__
+*.pyc

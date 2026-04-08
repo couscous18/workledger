@@ -1,0 +1,34 @@
+{
+  "benchmark_id": "software_capex_review_v1",
+  "policy_path": "../../policies/software_capex_review_v1.yaml",
+  "cases": [
+    {
+      "case_id": "maintenance_hotfix",
+      "input_path": "cases/maintenance_hotfix.jsonl",
+      "expected_work_category": "maintenance_bugfix",
+      "expected_policy_outcome": "maintenance_non_capitalizable",
+      "expected_reviewer_required": false
+    },
+    {
+      "case_id": "external_product_feature",
+      "input_path": "cases/external_product_feature.jsonl",
+      "expected_work_category": "external_product_development",
+      "expected_policy_outcome": "capitalize_candidate",
+      "expected_reviewer_required": false
+    },
+    {
+      "case_id": "internal_tooling",
+      "input_path": "cases/internal_tooling.jsonl",
+      "expected_work_category": "internal_use_software",
+      "expected_policy_outcome": "capitalize_candidate",
+      "expected_reviewer_required": true
+    },
+    {
+      "case_id": "ambiguous_review",
+      "input_path": "cases/ambiguous_review.jsonl",
+      "expected_work_category": "unknown",
+      "expected_policy_outcome": "review_required",
+      "expected_reviewer_required": true
+    }
+  ]
+}

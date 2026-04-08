@@ -1,0 +1,22 @@
+[
+  {
+    "traceId": "trace_marketing_fixture",
+    "spanId": "span_marketing_root",
+    "parentSpanId": null,
+    "name": "Generate marketing assets",
+    "kind": "server",
+    "startTime": "2026-04-06T11:00:00+00:00",
+    "endTime": "2026-04-06T11:00:09+00:00",
+    "status": { "code": "ok" },
+    "attributes": [
+      { "key": "openinference.span.kind", "value": "agent" },
+      { "key": "llm.model_name", "value": "gpt-4.1-mini" },
+      { "key": "llm.provider", "value": "openai" },
+      { "key": "llm.cost.usd", "value": 0.012 },
+      { "key": "campaign_id", "value": "CMP-OTEL-1" },
+      { "key": "title", "value": "Create launch email copy" },
+      { "key": "labels", "value": ["marketing", "campaign"] }
+    ]
+  }
+]
+

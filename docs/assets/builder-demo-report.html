@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>workledger builder demo</title>
+    <style>
+      :root {
+        --bg: #f4efe6;
+        --ink: #18202a;
+        --muted: #60707c;
+        --accent: #0f766e;
+        --accent-soft: #ddf3ee;
+        --panel: rgba(255, 252, 246, 0.9);
+        --border: #d7ccbb;
+        --warn: #9a3412;
+        --warn-soft: #ffedd5;
+        --review: #9d174d;
+        --review-soft: #fce7f3;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Iowan Old Style", "Palatino Linotype", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(15, 118, 110, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(154, 52, 18, 0.12), transparent 22%),
+          linear-gradient(180deg, #f9f5ee 0%, var(--bg) 100%);
+      }
+      main {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+      h1, h2, h3, p {
+        margin-top: 0;
+      }
+      h1 {
+        font-size: clamp(2.8rem, 5vw, 4.8rem);
+        margin-bottom: 0.5rem;
+      }
+      .lede {
+        max-width: 62rem;
+        color: var(--muted);
+        font-size: 1.15rem;
+        line-height: 1.55;
+      }
+      .chips,
+      .stat-grid,
+      .work-grid,
+      .contrast-grid {
+        display: grid;
+        gap: 16px;
+      }
+      .chips {
+        grid-template-columns: repeat(auto-fit, minmax(180px, max-content));
+        margin: 24px 0 32px;
+      }
+      .chip,
+      .card,
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: 0 16px 44px rgba(24, 32, 42, 0.08);
+      }
+      .chip {
+        padding: 14px 18px;
+        font-family: Arial, sans-serif;
+        font-size: 0.92rem;
+        letter-spacing: 0.03em;
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+        margin-bottom: 28px;
+      }
+      .panel {
+        padding: 24px;
+      }
+      .metric-label {
+        color: var(--muted);
+        font-family: Arial, sans-serif;
+        font-size: 0.82rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .metric-value {
+        font-size: 2.2rem;
+        margin-top: 8px;
+      }
+      .stat-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        margin-bottom: 28px;
+      }
+      .card {
+        padding: 20px;
+      }
+      .work-grid,
+      .contrast-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .kicker {
+        color: var(--accent);
+        font-family: Arial, sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .work-card h3,
+      .contrast-card h3 {
+        margin-bottom: 0.6rem;
+        font-size: 1.5rem;
+      }
+      .badge {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-family: Arial, sans-serif;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      .badge-accent {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+      .badge-warn {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+      .badge-review {
+        background: var(--review-soft);
+        color: var(--review);
+      }
+      ul {
+        margin: 0;
+        padding-left: 1.2rem;
+      }
+      li + li {
+        margin-top: 0.45rem;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+      }
+      .table th,
+      .table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+      .table th {
+        color: var(--muted);
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      @media (max-width: 900px) {
+        .hero,
+        .work-grid,
+        .contrast-grid,
+        .stat-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="kicker">Builder Demo Artifact</p>
+      <h1>workledger turns a run log into a work log.</h1>
+      <p class="lede">
+        This static artifact is based on the bundled agent-workflow demo. It shows the exact
+        moment the project becomes intuitive: 14 raw spans turn into 3 work units, covering
+        maintenance, product development, and internal automation, with one item queued for
+        review instead of being forced into certainty.
+      </p>
+
+      <div class="chips">
+        <div class="chip">14 source spans</div>
+        <div class="chip">3 work units</div>
+        <div class="chip">1 pending review item</div>
+        <div class="chip">1.56x average compression</div>
+      </div>
+
+      <section class="hero">
+        <div class="panel">
+          <p class="kicker">Before</p>
+          <h2>What the trace layer gives you</h2>
+          <ul>
+            <li>LLM calls, retrievers, tools, guardrails, and human review spans</li>
+            <li>Token counts, latency, and direct cost by span</li>
+            <li>No compact answer to “what work happened?”</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <p class="kicker">After</p>
+          <h2>What workledger gives you</h2>
+          <ul>
+            <li>Reviewable work units with titles and project context</li>
+            <li>Cost by work category, evidence, and review state</li>
+            <li>A review queue for the one item that still needs judgment</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="stat-grid">
+        <div class="card">
+          <div class="metric-label">Total Direct Cost</div>
+          <div class="metric-value">$0.1550</div>
+        </div>
+        <div class="card">
+          <div class="metric-label">Total Blended Cost</div>
+          <div class="metric-value">$0.1783</div>
+        </div>
+        <div class="card">
+          <div class="metric-label">Average Confidence</div>
+          <div class="metric-value">0.842</div>
+        </div>
+        <div class="card">
+          <div class="metric-label">Compression Proof</div>
+          <div class="metric-value">5 spans -> 1 unit</div>
+        </div>
+      </section>
+
+      <section class="work-grid">
+        <div class="card work-card">
+          <p class="kicker">Work Units</p>
+          <h3>Three outputs that a builder can reason about</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Implement orchestration dashboard for customers</td>
+                <td>external_product_development</td>
+                <td>$0.0828</td>
+              </tr>
+              <tr>
+                <td>Patch customer API timeout regression</td>
+                <td>maintenance_bugfix</td>
+                <td>$0.0483</td>
+              </tr>
+              <tr>
+                <td>Automate release checklist workflow</td>
+                <td>internal_use_software</td>
+                <td>$0.0471</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card work-card">
+          <p class="kicker">Review Queue</p>
+          <h3>The ambiguous item stays reviewable</h3>
+          <p>
+            <strong>Automate release checklist workflow</strong><br />
+            internal_use_software -> pending review
+          </p>
+          <p>Confidence: 0.768<br />Source spans: 3<br />Compression: 1.50x</p>
+          <span class="badge badge-review">Pending Review</span>
+        </div>
+      </section>
+
+      <section class="contrast-grid" style="margin-top: 28px;">
+        <div class="card contrast-card">
+          <p class="kicker">Maintenance Contrast</p>
+          <h3>Patch customer API timeout regression</h3>
+          <p>
+            This is the kind of work observability tools can describe technically but not
+            semantically. workledger rolls six spans into one maintenance work unit with clear
+            cost, evidence, and trace lineage.
+          </p>
+          <span class="badge badge-warn">maintenance work</span>
+        </div>
+        <div class="card contrast-card">
+          <p class="kicker">Development Contrast</p>
+          <h3>Implement orchestration dashboard for customers</h3>
+          <p>
+            Five spans become one external product development unit with a higher blended cost.
+            The useful question becomes review and confidence, not just trace inspection.
+          </p>
+          <span class="badge badge-accent">external product development</span>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top: 28px;">
+        <p class="kicker">Compression Story</p>
+        <h3>What builders should remember</h3>
+        <p class="lede" style="max-width: none;">
+          The best proof point in this demo is not a dashboard. It is the reduction from 14 spans
+          to 3 reviewable units of work. That smaller unit is what makes cost attribution,
+          evidence review, and downstream business analysis feel obvious instead of aspirational.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

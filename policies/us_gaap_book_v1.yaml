@@ -1,0 +1,34 @@
+policy_pack_id: us_gaap_book_v1
+version: 0.1.0
+basis: us_gaap_book_v1
+title: US GAAP Book Example
+description: Conservative example policy pack that maps work units into US GAAP-oriented candidate treatments for review.
+default_work_category: general_admin
+default_policy_outcome: review_required
+rules:
+  - id: gaap_maintenance
+    priority: 100
+    when:
+      any:
+        - feature: git.issue_labels
+          op: overlaps
+          value: ["bug", "maintenance", "incident"]
+    decision:
+      work_category: maintenance_bugfix
+      policy_outcome: maintenance_non_capitalizable
+      confidence: 0.9
+    explanation: Maintenance signals map to non-capitalizable maintenance candidate treatment.
+  - id: gaap_internal_use
+    priority: 90
+    when:
+      any:
+        - feature: git.repository
+          op: contains
+          value: internal
+    decision:
+      work_category: internal_use_software
+      policy_outcome: capitalize_candidate
+      confidence: 0.78
+      requires_review: true
+    explanation: Internal-use software may be capitalizable under a separate stage and evidence review.
+

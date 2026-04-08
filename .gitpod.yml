@@ -1,0 +1,19 @@
+tasks:
+  - name: Setup
+    init: |
+      pip install uv
+      uv sync --all-extras
+      pre-commit install
+    command: |
+      echo "Ready! Try: uv run wl demo all --project-dir .workledger/demo --open-report"
+
+ports:
+  - port: 8000
+    onOpen: notify
+    name: workledger API
+
+vscode:
+  extensions:
+    - ms-python.python
+    - charliermarsh.ruff
+    - ms-python.mypy-type-checker

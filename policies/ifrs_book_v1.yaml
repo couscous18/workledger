@@ -1,0 +1,38 @@
+policy_pack_id: ifrs_book_v1
+version: 0.1.0
+basis: ifrs_book_v1
+title: IFRS Book Example
+description: Example IFRS-oriented candidate policy pack that separates research from development and preserves ambiguity.
+default_work_category: general_admin
+default_policy_outcome: review_required
+rules:
+  - id: ifrs_research
+    priority: 100
+    when:
+      any:
+        - feature: labels
+          op: overlaps
+          value: ["research", "prototype", "experiment"]
+    decision:
+      work_category: research_and_development
+      policy_outcome: expense_now
+      confidence: 0.84
+      requires_review: true
+    explanation: Research-phase indicators suggest immediate expensing under a conservative IFRS interpretation.
+  - id: ifrs_development
+    priority: 90
+    when:
+      any:
+        - feature: labels
+          op: overlaps
+          value: ["feature", "product"]
+        - feature: git.repository
+          op: contains
+          value: product
+    decision:
+      work_category: external_product_development
+      policy_outcome: capitalize_candidate
+      confidence: 0.75
+      requires_review: true
+    explanation: Development-phase product signals may support capitalization pending stricter evidence review.
+

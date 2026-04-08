@@ -1,0 +1,23 @@
+services:
+  workledger:
+    build: .
+    ports:
+      - "${WORKLEDGER_PORT:-8000}:${WORKLEDGER_PORT:-8000}"
+    volumes:
+      - workledger_data:/data
+    environment:
+      WORKLEDGER_PROJECT_DIR: /data
+      WORKLEDGER_DATABASE_PATH: /data/workledger.duckdb
+      WORKLEDGER_HOST: 0.0.0.0
+      WORKLEDGER_PORT: ${WORKLEDGER_PORT:-8000}
+      WORKLEDGER_API_KEY: ${WORKLEDGER_API_KEY:-}
+      WORKLEDGER_MAX_BATCH_SIZE: ${WORKLEDGER_MAX_BATCH_SIZE:-10000}
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    command: workledger-server
+
+volumes:
+  workledger_data:

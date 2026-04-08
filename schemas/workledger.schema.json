@@ -1,0 +1,1217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/workledger/workledger/main/schemas/workledger.schema.json",
+  "title": "workledger core schema",
+  "type": "object",
+  "description": "Combined schema definitions for core V1 workledger objects.",
+  "definitions": {
+    "ObservationSpan": {
+      "$defs": {
+        "SourceKind": {
+          "enum": [
+            "opentelemetry",
+            "openinference",
+            "jsonl",
+            "cloudevent",
+            "sdk",
+            "manual"
+          ],
+          "title": "SourceKind",
+          "type": "string"
+        },
+        "SpanKind": {
+          "enum": [
+            "root",
+            "llm",
+            "agent",
+            "tool",
+            "retriever",
+            "evaluator",
+            "guardrail",
+            "review",
+            "io",
+            "other"
+          ],
+          "title": "SpanKind",
+          "type": "string"
+        },
+        "TokenTax": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string"
+            },
+            "jurisdiction": {
+              "title": "Jurisdiction",
+              "type": "string"
+            },
+            "rate": {
+              "minimum": 0.0,
+              "title": "Rate",
+              "type": "number"
+            },
+            "taxable_tokens": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Taxable Tokens"
+            },
+            "amount": {
+              "anyOf": [
+                {
+                  "minimum": 0.0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Amount"
+            },
+            "currency": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Currency"
+            },
+            "included_in_direct_cost": {
+              "default": false,
+              "title": "Included In Direct Cost",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "name",
+            "jurisdiction",
+            "rate"
+          ],
+          "title": "TokenTax",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "observation_id": {
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "source_kind": {
+          "$ref": "#/definitions/SourceKind"
+        },
+        "trace_id": {
+          "title": "Trace Id",
+          "type": "string"
+        },
+        "span_id": {
+          "title": "Span Id",
+          "type": "string"
+        },
+        "parent_span_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Span Id"
+        },
+        "span_kind": {
+          "$ref": "#/definitions/SpanKind",
+          "default": "other"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "start_time": {
+          "format": "date-time",
+          "title": "Start Time",
+          "type": "string"
+        },
+        "end_time": {
+          "format": "date-time",
+          "title": "End Time",
+          "type": "string"
+        },
+        "model_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Name"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider"
+        },
+        "tool_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool Name"
+        },
+        "token_input": {
+          "default": 0,
+          "title": "Token Input",
+          "type": "integer"
+        },
+        "token_output": {
+          "default": 0,
+          "title": "Token Output",
+          "type": "integer"
+        },
+        "token_taxes": {
+          "items": {
+            "$ref": "#/definitions/TokenTax"
+          },
+          "title": "Token Taxes",
+          "type": "array"
+        },
+        "direct_cost": {
+          "default": 0.0,
+          "title": "Direct Cost",
+          "type": "number"
+        },
+        "status": {
+          "default": "ok",
+          "title": "Status",
+          "type": "string"
+        },
+        "attributes": {
+          "additionalProperties": true,
+          "title": "Attributes",
+          "type": "object"
+        },
+        "raw_payload_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Payload Ref"
+        },
+        "masked": {
+          "default": false,
+          "title": "Masked",
+          "type": "boolean"
+        },
+        "redaction_applied": {
+          "default": false,
+          "title": "Redaction Applied",
+          "type": "boolean"
+        },
+        "work_unit_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Work Unit Key"
+        },
+        "facets": {
+          "additionalProperties": true,
+          "title": "Facets",
+          "type": "object"
+        }
+      },
+      "required": [
+        "source_kind",
+        "trace_id",
+        "span_id",
+        "name",
+        "start_time",
+        "end_time"
+      ],
+      "title": "ObservationSpan",
+      "type": "object"
+    },
+    "WorkUnit": {
+      "$defs": {
+        "ActorKind": {
+          "enum": [
+            "human",
+            "agent",
+            "hybrid",
+            "service"
+          ],
+          "title": "ActorKind",
+          "type": "string"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "evidence_id": {
+              "title": "Evidence Id",
+              "type": "string"
+            },
+            "evidence_kind": {
+              "title": "Evidence Kind",
+              "type": "string"
+            },
+            "uri": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Uri"
+            },
+            "preview": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Preview"
+            },
+            "source_system": {
+              "title": "Source System",
+              "type": "string"
+            },
+            "digest": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Digest"
+            },
+            "sensitivity": {
+              "default": "internal",
+              "title": "Sensitivity",
+              "type": "string"
+            },
+            "timestamp": {
+              "format": "date-time",
+              "title": "Timestamp",
+              "type": "string"
+            },
+            "attributes": {
+              "additionalProperties": true,
+              "title": "Attributes",
+              "type": "object"
+            }
+          },
+          "required": [
+            "evidence_kind",
+            "source_system"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "ImportanceBand": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "title": "ImportanceBand",
+          "type": "string"
+        },
+        "ReviewState": {
+          "enum": [
+            "unreviewed",
+            "queued",
+            "reviewed",
+            "overridden"
+          ],
+          "title": "ReviewState",
+          "type": "string"
+        },
+        "TrustState": {
+          "enum": [
+            "unreviewed",
+            "self_checked",
+            "human_reviewed",
+            "approved",
+            "rejected",
+            "superseded"
+          ],
+          "title": "TrustState",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "work_unit_id": {
+          "title": "Work Unit Id",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "objective": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Objective"
+        },
+        "actor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Actor"
+        },
+        "actor_kind": {
+          "$ref": "#/definitions/ActorKind",
+          "default": "service"
+        },
+        "project": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Project"
+        },
+        "team": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Team"
+        },
+        "cost_center": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Center"
+        },
+        "source_systems": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Systems",
+          "type": "array"
+        },
+        "input_artifact_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Input Artifact Refs",
+          "type": "array"
+        },
+        "output_artifact_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Output Artifact Refs",
+          "type": "array"
+        },
+        "start_time": {
+          "format": "date-time",
+          "title": "Start Time",
+          "type": "string"
+        },
+        "end_time": {
+          "format": "date-time",
+          "title": "End Time",
+          "type": "string"
+        },
+        "duration_ms": {
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "review_state": {
+          "$ref": "#/definitions/ReviewState",
+          "default": "unreviewed"
+        },
+        "trust_state": {
+          "$ref": "#/definitions/TrustState",
+          "default": "unreviewed"
+        },
+        "importance_score": {
+          "default": 0.0,
+          "title": "Importance Score",
+          "type": "number"
+        },
+        "importance_band": {
+          "$ref": "#/definitions/ImportanceBand",
+          "default": "low"
+        },
+        "direct_cost": {
+          "default": 0.0,
+          "title": "Direct Cost",
+          "type": "number"
+        },
+        "allocated_cost": {
+          "default": 0.0,
+          "title": "Allocated Cost",
+          "type": "number"
+        },
+        "evidence_bundle": {
+          "items": {
+            "$ref": "#/definitions/EvidenceRef"
+          },
+          "title": "Evidence Bundle",
+          "type": "array"
+        },
+        "lineage_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Lineage Refs",
+          "type": "array"
+        },
+        "source_span_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Span Ids",
+          "type": "array"
+        },
+        "compression_ratio": {
+          "default": 1.0,
+          "title": "Compression Ratio",
+          "type": "number"
+        },
+        "labels": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Labels",
+          "type": "array"
+        },
+        "facets": {
+          "additionalProperties": true,
+          "title": "Facets",
+          "type": "object"
+        }
+      },
+      "required": [
+        "kind",
+        "title",
+        "summary",
+        "start_time",
+        "end_time",
+        "duration_ms"
+      ],
+      "title": "WorkUnit",
+      "type": "object"
+    },
+    "ClassificationTrace": {
+      "$defs": {
+        "EvidenceStrength": {
+          "enum": [
+            "weak",
+            "moderate",
+            "strong",
+            "verified"
+          ],
+          "title": "EvidenceStrength",
+          "type": "string"
+        },
+        "PolicyDecision": {
+          "additionalProperties": false,
+          "properties": {
+            "decision_id": {
+              "title": "Decision Id",
+              "type": "string"
+            },
+            "trace_id": {
+              "title": "Trace Id",
+              "type": "string"
+            },
+            "rule_id": {
+              "title": "Rule Id",
+              "type": "string"
+            },
+            "model_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Model Id"
+            },
+            "decision_type": {
+              "title": "Decision Type",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "string"
+            },
+            "confidence": {
+              "title": "Confidence",
+              "type": "number"
+            },
+            "explanation": {
+              "title": "Explanation",
+              "type": "string"
+            },
+            "evidence_refs": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Evidence Refs",
+              "type": "array"
+            },
+            "competing_candidates": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Competing Candidates",
+              "type": "array"
+            },
+            "requires_review": {
+              "default": false,
+              "title": "Requires Review",
+              "type": "boolean"
+            },
+            "features_used": {
+              "additionalProperties": true,
+              "title": "Features Used",
+              "type": "object"
+            }
+          },
+          "required": [
+            "trace_id",
+            "rule_id",
+            "decision_type",
+            "value",
+            "confidence",
+            "explanation"
+          ],
+          "title": "PolicyDecision",
+          "type": "object"
+        },
+        "PolicyOutcome": {
+          "enum": [
+            "expense_now",
+            "capitalize_candidate",
+            "maintenance_non_capitalizable",
+            "review_required",
+            "policy_excluded"
+          ],
+          "title": "PolicyOutcome",
+          "type": "string"
+        },
+        "WorkCategory": {
+          "enum": [
+            "research_and_development",
+            "internal_use_software",
+            "external_product_development",
+            "maintenance_bugfix",
+            "support_service_delivery",
+            "advertising_marketing",
+            "sales_enablement",
+            "general_admin",
+            "compliance_legal",
+            "data_ops",
+            "unknown"
+          ],
+          "title": "WorkCategory",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "classification_id": {
+          "title": "Classification Id",
+          "type": "string"
+        },
+        "work_unit_id": {
+          "title": "Work Unit Id",
+          "type": "string"
+        },
+        "policy_basis": {
+          "title": "Policy Basis",
+          "type": "string"
+        },
+        "work_category": {
+          "$ref": "#/definitions/WorkCategory",
+          "default": "unknown"
+        },
+        "policy_outcome": {
+          "$ref": "#/definitions/PolicyOutcome",
+          "default": "review_required"
+        },
+        "cost_category": {
+          "default": "ai_work",
+          "title": "Cost Category",
+          "type": "string"
+        },
+        "direct_cost": {
+          "default": 0.0,
+          "title": "Direct Cost",
+          "type": "number"
+        },
+        "indirect_cost": {
+          "default": 0.0,
+          "title": "Indirect Cost",
+          "type": "number"
+        },
+        "blended_cost": {
+          "default": 0.0,
+          "title": "Blended Cost",
+          "type": "number"
+        },
+        "confidence_score": {
+          "default": 0.0,
+          "title": "Confidence Score",
+          "type": "number"
+        },
+        "evidence_score": {
+          "default": 0.0,
+          "title": "Evidence Score",
+          "type": "number"
+        },
+        "evidence_strength": {
+          "$ref": "#/definitions/EvidenceStrength",
+          "default": "weak"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "features_used": {
+          "additionalProperties": true,
+          "title": "Features Used",
+          "type": "object"
+        },
+        "reviewer_required": {
+          "default": false,
+          "title": "Reviewer Required",
+          "type": "boolean"
+        },
+        "reviewer_status": {
+          "default": "pending",
+          "title": "Reviewer Status",
+          "type": "string"
+        },
+        "override_status": {
+          "default": "none",
+          "title": "Override Status",
+          "type": "string"
+        },
+        "policy_hint": {
+          "title": "Policy Hint",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "decisions": {
+          "items": {
+            "$ref": "#/definitions/PolicyDecision"
+          },
+          "title": "Decisions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "work_unit_id",
+        "policy_basis",
+        "explanation",
+        "policy_hint"
+      ],
+      "title": "ClassificationTrace",
+      "type": "object"
+    },
+    "PolicyDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_id": {
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "trace_id": {
+          "title": "Trace Id",
+          "type": "string"
+        },
+        "rule_id": {
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "model_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Id"
+        },
+        "decision_type": {
+          "title": "Decision Type",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        },
+        "confidence": {
+          "title": "Confidence",
+          "type": "number"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "competing_candidates": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Competing Candidates",
+          "type": "array"
+        },
+        "requires_review": {
+          "default": false,
+          "title": "Requires Review",
+          "type": "boolean"
+        },
+        "features_used": {
+          "additionalProperties": true,
+          "title": "Features Used",
+          "type": "object"
+        }
+      },
+      "required": [
+        "trace_id",
+        "rule_id",
+        "decision_type",
+        "value",
+        "confidence",
+        "explanation"
+      ],
+      "title": "PolicyDecision",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "evidence_kind": {
+          "title": "Evidence Kind",
+          "type": "string"
+        },
+        "uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uri"
+        },
+        "preview": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Preview"
+        },
+        "source_system": {
+          "title": "Source System",
+          "type": "string"
+        },
+        "digest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Digest"
+        },
+        "sensitivity": {
+          "default": "internal",
+          "title": "Sensitivity",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "attributes": {
+          "additionalProperties": true,
+          "title": "Attributes",
+          "type": "object"
+        }
+      },
+      "required": [
+        "evidence_kind",
+        "source_system"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "PolicyPack": {
+      "$defs": {
+        "PolicyOutcome": {
+          "enum": [
+            "expense_now",
+            "capitalize_candidate",
+            "maintenance_non_capitalizable",
+            "review_required",
+            "policy_excluded"
+          ],
+          "title": "PolicyOutcome",
+          "type": "string"
+        },
+        "WorkCategory": {
+          "enum": [
+            "research_and_development",
+            "internal_use_software",
+            "external_product_development",
+            "maintenance_bugfix",
+            "support_service_delivery",
+            "advertising_marketing",
+            "sales_enablement",
+            "general_admin",
+            "compliance_legal",
+            "data_ops",
+            "unknown"
+          ],
+          "title": "WorkCategory",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "policy_pack_id": {
+          "title": "Policy Pack Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "basis": {
+          "title": "Basis",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "default_work_category": {
+          "$ref": "#/definitions/WorkCategory",
+          "default": "unknown"
+        },
+        "default_policy_outcome": {
+          "$ref": "#/definitions/PolicyOutcome",
+          "default": "review_required"
+        },
+        "rules": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "policy_pack_id",
+        "version",
+        "basis",
+        "title",
+        "description",
+        "rules"
+      ],
+      "title": "PolicyPack",
+      "type": "object"
+    },
+    "PolicyRun": {
+      "additionalProperties": false,
+      "properties": {
+        "policy_run_id": {
+          "title": "Policy Run Id",
+          "type": "string"
+        },
+        "policy_basis": {
+          "title": "Policy Basis",
+          "type": "string"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "trace_count": {
+          "default": 0,
+          "title": "Trace Count",
+          "type": "integer"
+        },
+        "review_required_count": {
+          "default": 0,
+          "title": "Review Required Count",
+          "type": "integer"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "policy_basis"
+      ],
+      "title": "PolicyRun",
+      "type": "object"
+    },
+    "ReportArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "report_id": {
+          "title": "Report Id",
+          "type": "string"
+        },
+        "report_kind": {
+          "title": "Report Kind",
+          "type": "string"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        },
+        "content_type": {
+          "title": "Content Type",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        }
+      },
+      "required": [
+        "report_kind",
+        "uri",
+        "content_type"
+      ],
+      "title": "ReportArtifact",
+      "type": "object"
+    },
+    "ReviewOverride": {
+      "$defs": {
+        "PolicyOutcome": {
+          "enum": [
+            "expense_now",
+            "capitalize_candidate",
+            "maintenance_non_capitalizable",
+            "review_required",
+            "policy_excluded"
+          ],
+          "title": "PolicyOutcome",
+          "type": "string"
+        },
+        "WorkCategory": {
+          "enum": [
+            "research_and_development",
+            "internal_use_software",
+            "external_product_development",
+            "maintenance_bugfix",
+            "support_service_delivery",
+            "advertising_marketing",
+            "sales_enablement",
+            "general_admin",
+            "compliance_legal",
+            "data_ops",
+            "unknown"
+          ],
+          "title": "WorkCategory",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "override_id": {
+          "title": "Override Id",
+          "type": "string"
+        },
+        "classification_id": {
+          "title": "Classification Id",
+          "type": "string"
+        },
+        "reviewer": {
+          "title": "Reviewer",
+          "type": "string"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        },
+        "work_category": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/WorkCategory"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "policy_outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/PolicyOutcome"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "classification_id",
+        "reviewer",
+        "note"
+      ],
+      "title": "ReviewOverride",
+      "type": "object"
+    }
+  }
+}
