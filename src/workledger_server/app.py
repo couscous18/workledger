@@ -49,8 +49,10 @@ def create_app(config: WorkledgerConfig | None = None) -> FastAPI:
 
     @protected.get("/policies", dependencies=[Depends(verify_api_key)])
     def policies() -> list[dict[str, Any]]:
+        policies_dir = pipeline.config.policies_dir
+        assert policies_dir is not None
         return [
-            pack.model_dump(mode="json") for pack in list_policy_packs(pipeline.config.policies_dir)
+            pack.model_dump(mode="json") for pack in list_policy_packs(policies_dir)
         ]
 
     @protected.post("/ingest/events", dependencies=[Depends(verify_api_key)])

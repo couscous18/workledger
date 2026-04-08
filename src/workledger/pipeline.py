@@ -31,8 +31,12 @@ class WorkledgerPipeline:
     def __init__(self, config: WorkledgerConfig | None = None) -> None:
         self.config = config or WorkledgerConfig()
         self.config.ensure_dirs()
-        ensure_builtin_policies(self.config.policies_dir)
-        self.store = DuckDBStore(self.config.database_path)
+        policies_dir = self.config.policies_dir
+        database_path = self.config.database_path
+        assert policies_dir is not None
+        assert database_path is not None
+        ensure_builtin_policies(policies_dir)
+        self.store = DuckDBStore(database_path)
         self.rollup_engine = RollupEngine(RollupConfig())
         self.policy_engine = PolicyEngine()
         self.report_engine = ReportEngine(self.store)
@@ -52,7 +56,9 @@ class WorkledgerPipeline:
         return result
 
     def ingest_payloads(self, payloads: list[dict[str, Any]]) -> IngestResult:
-        payload_path = self.config.raw_events_dir / "api-ingest.json"
+        raw_events_dir = self.config.raw_events_dir
+        assert raw_events_dir is not None
+        payload_path = raw_events_dir / "api-ingest.json"
         payload_path.write_text(json.dumps(payloads, indent=2), encoding="utf-8")
         spans: list[ObservationSpan] = []
         errors: list[IngestError] = []
@@ -91,8 +97,10 @@ class WorkledgerPipeline:
         return traces
 
     def report(self, *, include_economics: bool = False) -> list[Any]:
+        reports_dir = self.config.reports_dir
+        assert reports_dir is not None
         return self.report_engine.write_report_bundle(
-            self.config.reports_dir,
+            reports_dir,
             include_economics=include_economics,
         )
 
@@ -126,5 +134,7 @@ class WorkledgerPipeline:
 
     def _load_policy(self, policy_path: Path | None) -> PolicyPack:
         if policy_path is None:
-            policy_path = self.config.policies_dir / "management_reporting_v1.yaml"
+            policies_dir = self.config.policies_dir
+            assert policies_dir is not None
+            policy_path = policies_dir / "management_reporting_v1.yaml"
         return load_policy_pack(policy_path)

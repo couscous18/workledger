@@ -457,11 +457,15 @@ def write_demo_file(name: str, destination: Path) -> Path:
 def run_demo(name: str, project_dir: Path, policy_path: Path | None = None) -> dict[str, Any]:
     config = WorkledgerConfig.from_project_dir(project_dir)
     pipeline = WorkledgerPipeline(config)
-    input_path = write_demo_file(name, config.raw_events_dir / f"{name}.jsonl")
+    raw_events_dir = config.raw_events_dir
+    policies_dir = config.policies_dir
+    assert raw_events_dir is not None
+    assert policies_dir is not None
+    input_path = write_demo_file(name, raw_events_dir / f"{name}.jsonl")
     ingest_result = pipeline.ingest(input_path)
     work_units = pipeline.rollup()
     policy_path = (
-        config.policies_dir / "software_capex_review_v1.yaml"
+        policies_dir / "software_capex_review_v1.yaml"
         if name == "capex" and policy_path is None
         else policy_path
     )
