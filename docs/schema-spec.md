@@ -10,6 +10,6 @@ ObservationSpan -> WorkUnit -> ClassificationTrace
 
 ## Published Artifacts
 
-- [schemas/workledger.schema.json](/Users/anji/Documents/GitHub/Work%20Unit/schemas/workledger.schema.json)
-- [schemas/openapi.json](/Users/anji/Documents/GitHub/Work%20Unit/schemas/openapi.json)
-- [spec/versioning.md](/Users/anji/Documents/GitHub/Work%20Unit/spec/versioning.md)
+- [schemas/workledger.schema.json](https://github.com/couscous18/workledger/blob/main/schemas/workledger.schema.json)
+- [schemas/openapi.json](https://github.com/couscous18/workledger/blob/main/schemas/openapi.json)
+- [spec/versioning.md](https://github.com/couscous18/workledger/blob/main/spec/versioning.md)

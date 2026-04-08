@@ -2,9 +2,9 @@
 
 You can get value from WorkLedger today without a dedicated adapter package.
 
-- [examples/langchain_to_workledger.py](/Users/anji/Documents/GitHub/Work%20Unit/examples/langchain_to_workledger.py)
-- [examples/crewai_to_workledger.py](/Users/anji/Documents/GitHub/Work%20Unit/examples/crewai_to_workledger.py)
-- [examples/otel_to_workledger.py](/Users/anji/Documents/GitHub/Work%20Unit/examples/otel_to_workledger.py)
+- [examples/langchain_to_workledger.py](https://github.com/couscous18/workledger/blob/main/examples/langchain_to_workledger.py)
+- [examples/crewai_to_workledger.py](https://github.com/couscous18/workledger/blob/main/examples/crewai_to_workledger.py)
+- [examples/otel_to_workledger.py](https://github.com/couscous18/workledger/blob/main/examples/otel_to_workledger.py)
 
 Common pattern:
 

@@ -1,0 +1,67 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish, for example v0.1.0"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Build distribution artifacts
+        run: uv build
+
+      - name: Resolve release metadata
+        id: metadata
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ github.event.inputs.tag }}"
+          else
+            tag="${GITHUB_REF_NAME}"
+          fi
+
+          notes_file="docs/releases/${tag}.md"
+
+          echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+          echo "notes_file=${notes_file}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create GitHub release
+        run: |
+          tag="${{ steps.metadata.outputs.tag }}"
+          notes_file="${{ steps.metadata.outputs.notes_file }}"
+
+          if [ -f "${notes_file}" ]; then
+            gh release create "${tag}" dist/* \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "workledger ${tag}" \
+              --notes-file "${notes_file}"
+          else
+            gh release create "${tag}" dist/* \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "workledger ${tag}" \
+              --generate-notes
+          fi

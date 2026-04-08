@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Optional `ObservationSpan.token_taxes` support for employer-style token tax metadata, including jurisdiction, rate, taxable token count, and tax amount
+- GitHub release workflow that builds sdist and wheel artifacts and publishes them to the Releases page when a `v*` tag is pushed
 
 ## [0.1.0] - 2026-04-06
 
