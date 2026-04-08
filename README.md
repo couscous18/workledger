@@ -1,10 +1,9 @@
 # workledger
 
-[![CI](https://github.com/workledger/workledger/actions/workflows/ci.yml/badge.svg)](https://github.com/workledger/workledger/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/workledger.svg)](https://pypi.org/project/workledger/)
+[![CI](https://github.com/couscous18/workledger/actions/workflows/ci.yml/badge.svg)](https://github.com/couscous18/workledger/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://workledger.github.io/workledger/)
+[![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://couscous18.github.io/workledger/)
 
 `workledger` is an agent work ledger for AI systems.
 
@@ -18,15 +17,19 @@ AI traces are great at capturing execution, but teams still need a way to answer
 
 `workledger` introduces `WorkUnit` as the missing layer between span-level telemetry and business or governance decisions. Feed in OpenTelemetry, OpenInference, JSONL, or SDK events. Get back reviewable units of work with cost, evidence, policy context, and transparent economics.
 
+PyPI is not published yet. Until it is, install from source from this repository.
+
 ```bash
-pip install workledger
-wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-wl compare-costs --from-project .workledger/agent-cost
+git clone https://github.com/couscous18/workledger.git
+cd workledger
+uv sync --all-extras
+uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
+uv run wl compare-costs --from-project .workledger/agent-cost
 ```
 
-![workledger before and after](docs/assets/workledger-before-after.svg)
+![workledger demo screenshot](docs/assets/workledger-demo-screenshot.png)
 
-[See Proof Artifact](docs/assets/builder-demo-report.html) · [Builder Demo](docs/builder-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://workledger.github.io/workledger/)
+[Release Notes v0.1.0](docs/releases/v0.1.0.md) · [See Proof Artifact](docs/assets/builder-demo-report.html) · [Builder Demo](docs/builder-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
 
 ## The Missing Primitive
 
@@ -65,25 +68,18 @@ That lets builders move from "what executed?" to questions like:
 - Separate observed facts from modeled assumptions
 - Stay open, inspectable, and local-first by default
 
-## 60-Second Quickstart
-
-### From PyPI
+## Try It In 60 Seconds
 
 ```bash
-pip install workledger
-wl init --project-dir .workledger
-wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-wl compare-costs --from-project .workledger/agent-cost
-```
-
-### From source
-
-```bash
+git clone https://github.com/couscous18/workledger.git
+cd workledger
 uv sync --all-extras
 uv run wl init --project-dir .workledger
 uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
 uv run wl compare-costs --from-project .workledger/agent-cost
 ```
+
+PyPI is intentionally not part of the public install story yet. When `workledger` is actually published there, this section can switch to `pip install`. Until then, every public doc should point here.
 
 ### What You Should See
 
@@ -98,8 +94,8 @@ uv run wl compare-costs --from-project .workledger/agent-cost
 If you want the multi-team demo set after the flagship agent path:
 
 ```bash
-wl demo all --project-dir .workledger/demo --open-report
-wl compare-costs --from-project .workledger/demo
+uv run wl demo all --project-dir .workledger/demo --open-report
+uv run wl compare-costs --from-project .workledger/demo
 ```
 
 ### Tiny Python Example

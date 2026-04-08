@@ -48,10 +48,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/workledger/workledger"
-Documentation = "https://workledger.github.io/workledger/"
-Repository = "https://github.com/workledger/workledger"
-Issues = "https://github.com/workledger/workledger/issues"
+Homepage = "https://github.com/couscous18/workledger"
+Documentation = "https://couscous18.github.io/workledger/"
+Repository = "https://github.com/couscous18/workledger"
+Issues = "https://github.com/couscous18/workledger/issues"
 
 [project.optional-dependencies]
 dev = [

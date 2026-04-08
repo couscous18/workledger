@@ -5,15 +5,19 @@
 ## Install
 
 ```bash
-pip install workledger
-wl init --project-dir .workledger
+git clone https://github.com/couscous18/workledger.git
+cd workledger
+uv sync --all-extras
+uv run wl init --project-dir .workledger
 ```
+
+PyPI is not published yet. Until that changes, source install is the canonical public setup path.
 
 ## Quickstart: Agent Work Ledger
 
 ```bash
-wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-wl compare-costs --from-project .workledger/agent-cost
+uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
+uv run wl compare-costs --from-project .workledger/agent-cost
 ```
 
 This flagship path shows the core thesis fastest:
