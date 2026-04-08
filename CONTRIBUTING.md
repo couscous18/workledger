@@ -17,7 +17,7 @@ Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
 ```bash
 # Clone the repository
-git clone https://github.com/workledger/workledger.git
+git clone https://github.com/couscous18/workledger.git
 cd workledger
 
 # Install dependencies (includes dev tools)
@@ -49,15 +49,15 @@ make ci        # lint + test (same as CI)
 
 ## What to Work On
 
-- Issues labeled [`good first issue`](https://github.com/workledger/workledger/labels/good%20first%20issue) are a great starting point
-- Issues labeled [`help wanted`](https://github.com/workledger/workledger/labels/help%20wanted) are more involved but well-defined
+- Issues labeled [`good first issue`](https://github.com/couscous18/workledger/labels/good%20first%20issue) are a great starting point
+- Issues labeled [`help wanted`](https://github.com/couscous18/workledger/labels/help%20wanted) are more involved but well-defined
 - Check the [Roadmap](README.md#roadmap) for larger initiatives
 - Documentation improvements are always welcome
 - Benchmarks, example demos, policy packs, and integrations are intentionally small starter surfaces and welcome expansion
 
 ## Contribution Guidelines
 
-- **Keep the core schema stable and explicit.** Breaking changes to `ObservationSpan`, `WorkUnit`, `AccountingTrace`, or `AccountingDecision` require discussion first.
+- **Keep the core schema stable and explicit.** Breaking changes to `ObservationSpan`, `WorkUnit`, `ClassificationTrace`, or `PolicyDecision` require discussion first.
 - **Prefer extension facets over bloating core models.** The facet system exists for domain-specific metadata.
 - **Preserve explainability.** Rollup and policy changes must produce traceable, auditable decisions.
 - **Add or update fixtures** for every behavior change in rollup or classification.
@@ -84,7 +84,7 @@ Update policy engine to support negated conditions
 
 ## Architecture Decisions
 
-Major changes (new storage backends, schema changes, new policy evaluation strategies) should start as a [GitHub Discussion](https://github.com/workledger/workledger/discussions) before implementation.
+Major changes (new storage backends, schema changes, new policy evaluation strategies) should start as a [GitHub Discussion](https://github.com/couscous18/workledger/discussions) before implementation.
 
 ## Running Tests
 
@@ -116,4 +116,4 @@ uv run mkdocs serve
 
 ## Questions?
 
-Open a [GitHub Discussion](https://github.com/workledger/workledger/discussions) or check the [FAQ](docs/faq.md). Discussions and issues are the primary community support channels for this repository.
+Open a [GitHub Discussion](https://github.com/couscous18/workledger/discussions) or check the [FAQ](docs/faq.md). Discussions and issues are the primary community support channels for this repository.

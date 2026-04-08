@@ -2,21 +2,18 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
 try:
     from pydantic_settings import BaseSettings
-    from pydantic_settings import SettingsConfigDict as _SettingsConfigDict
 except ImportError:  # pragma: no cover - fallback for lean environments
     BaseSettings = BaseModel  # type: ignore[misc,assignment]
 
 
-def _settings_config_dict(**kwargs: object) -> dict[str, object]:
-    try:
-        return dict(_SettingsConfigDict(**kwargs))
-    except NameError:  # pragma: no cover - fallback for lean environments
-        return dict(kwargs)
+def _settings_config_dict(**kwargs: object) -> Any:
+    return dict(kwargs)
 
 
 def _dotenv_values(path: Path = Path(".env")) -> dict[str, str]:
@@ -100,4 +97,5 @@ class WorkledgerConfig(BaseSettings):
             self.reports_dir,
             self.policies_dir,
         ):
+            assert path is not None
             path.mkdir(parents=True, exist_ok=True)
