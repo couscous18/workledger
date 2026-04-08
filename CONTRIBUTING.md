@@ -57,7 +57,7 @@ make ci        # lint + test (same as CI)
 
 ## Contribution Guidelines
 
-- **Keep the core schema stable and explicit.** Breaking changes to `ObservationSpan`, `WorkUnit`, `AccountingTrace`, or `AccountingDecision` require discussion first.
+- **Keep the core schema stable and explicit.** Breaking changes to `ObservationSpan`, `WorkUnit`, `ClassificationTrace`, or `PolicyDecision` require discussion first.
 - **Prefer extension facets over bloating core models.** The facet system exists for domain-specific metadata.
 - **Preserve explainability.** Rollup and policy changes must produce traceable, auditable decisions.
 - **Add or update fixtures** for every behavior change in rollup or classification.

@@ -17,11 +17,20 @@ AI traces are great at capturing execution, but teams still need a way to answer
 
 `workledger` introduces `WorkUnit` as the missing layer between span-level telemetry and business or governance decisions. Feed in OpenTelemetry, OpenInference, JSONL, or SDK events. Get back reviewable units of work with cost, evidence, policy context, and transparent economics.
 
-PyPI is not published yet. Until it is, install from source from this repository.
+## Who This Is For
+
+- Teams running AI agents that produce execution traces (OpenTelemetry, OpenInference, JSONL)
+- Engineers who need to answer "what work happened?" not just "what code ran?"
+- Finance and governance teams that need policy-backed classification of AI work
+
+## Who This Is Not For
+
+- Generic application analytics or APM replacement
+- A tracing backend — workledger consumes traces, it doesn't collect them
+- Production-ready systems (this is alpha, expect breaking changes)
 
 ```bash
-git clone https://github.com/couscous18/workledger.git
-cd workledger
+git clone https://github.com/couscous18/workledger.git && cd workledger
 uv sync --all-extras
 uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
 uv run wl compare-costs --from-project .workledger/agent-cost
@@ -29,7 +38,7 @@ uv run wl compare-costs --from-project .workledger/agent-cost
 
 ![workledger demo screenshot](docs/assets/workledger-demo-screenshot.png)
 
-[Release Notes v0.1.0](docs/releases/v0.1.0.md) · [See Proof Artifact](docs/assets/builder-demo-report.html) · [Builder Demo](docs/builder-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
+[See Proof Artifact](docs/assets/builder-demo-report.html) · [Builder Demo](docs/builder-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
 
 ## The Missing Primitive
 
@@ -68,7 +77,9 @@ That lets builders move from "what executed?" to questions like:
 - Separate observed facts from modeled assumptions
 - Stay open, inspectable, and local-first by default
 
-## Try It In 60 Seconds
+## 60-Second Quickstart
+
+### Install from source
 
 ```bash
 git clone https://github.com/couscous18/workledger.git
@@ -79,7 +90,7 @@ uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
 uv run wl compare-costs --from-project .workledger/agent-cost
 ```
 
-PyPI is intentionally not part of the public install story yet. When `workledger` is actually published there, this section can switch to `pip install`. Until then, every public doc should point here.
+> PyPI publishing is coming. For now, install from source.
 
 ### What You Should See
 
@@ -97,6 +108,20 @@ If you want the multi-team demo set after the flagship agent path:
 uv run wl demo all --project-dir .workledger/demo --open-report
 uv run wl compare-costs --from-project .workledger/demo
 ```
+
+### Bring Your Own Traces (3 Minutes)
+
+Already have OpenTelemetry JSON exports? Try this:
+
+```bash
+uv run wl init --project-dir .workledger/my-traces
+uv run wl ingest .workledger/my-traces your-traces.json --format otel
+uv run wl rollup .workledger/my-traces
+uv run wl classify .workledger/my-traces
+uv run wl report .workledger/my-traces --format html --open
+```
+
+Supported formats: `otel`, `openinference`, `jsonl`, `cloudevents`, `sdk`
 
 ### Tiny Python Example
 

@@ -11,8 +11,7 @@
 If you only try one thing, run:
 
 ```bash
-git clone https://github.com/couscous18/workledger.git
-cd workledger
+git clone https://github.com/couscous18/workledger.git && cd workledger
 uv sync --all-extras
 uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
 uv run wl compare-costs --from-project .workledger/agent-cost

@@ -201,11 +201,13 @@ def report(
 def policies_list(project_dir: ProjectDirOption = Path(".workledger")) -> None:
     """List installed policy packs."""
     config = WorkledgerConfig.from_project_dir(project_dir)
+    policies_dir = config.policies_dir
+    assert policies_dir is not None
     table = Table(title="policy packs")
     table.add_column("basis")
     table.add_column("version")
     table.add_column("title")
-    for pack in list_policy_packs(config.policies_dir):
+    for pack in list_policy_packs(policies_dir):
         table.add_row(pack.basis, pack.version, pack.title)
     console.print(table)
 
@@ -431,8 +433,10 @@ def doctor(project_dir: ProjectDirOption = Path(".workledger")) -> None:
         status = "ok" if importlib.util.find_spec(module_name) else "missing"
         table.add_row(f"python module: {module_name}", status)
     config = WorkledgerConfig.from_project_dir(project_dir)
+    policies_dir = config.policies_dir
+    assert policies_dir is not None
     table.add_row("project dir", "ok" if config.project_dir.exists() else "missing")
-    table.add_row("policies", "ok" if config.policies_dir.exists() else "missing")
+    table.add_row("policies", "ok" if policies_dir.exists() else "missing")
     console.print(table)
 
 
