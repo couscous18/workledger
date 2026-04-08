@@ -16,8 +16,8 @@ uv run wl init --project-dir .workledger
 ## Quickstart: Agent Work Ledger
 
 ```bash
-wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-wl compare-costs --from-project .workledger/agent-cost
+uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
+uv run wl compare-costs --from-project .workledger/agent-cost
 ```
 
 This flagship path shows the core thesis fastest:

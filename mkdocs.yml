@@ -32,8 +32,11 @@ theme:
         name: Switch to light mode
 
 nav:
+  - Home: index.md
   - Builder Demo: builder-demo.md
+  - Release Notes (0.1.0): releases/v0.1.0.md
   - Getting Started: getting-started.md
+  - Installation: installation.md
   - How It Works: how-it-works.md
   - CLI Reference: cli.md
   - Data Model: data-model.md

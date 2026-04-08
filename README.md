@@ -36,7 +36,7 @@ uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
 uv run wl compare-costs --from-project .workledger/agent-cost
 ```
 
-![workledger before and after](docs/assets/workledger-before-after.svg)
+![workledger demo screenshot](docs/assets/workledger-demo-screenshot.png)
 
 [See Proof Artifact](docs/assets/builder-demo-report.html) · [Builder Demo](docs/builder-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
 
@@ -105,8 +105,8 @@ uv run wl compare-costs --from-project .workledger/agent-cost
 If you want the multi-team demo set after the flagship agent path:
 
 ```bash
-wl demo all --project-dir .workledger/demo --open-report
-wl compare-costs --from-project .workledger/demo
+uv run wl demo all --project-dir .workledger/demo --open-report
+uv run wl compare-costs --from-project .workledger/demo
 ```
 
 ### Bring Your Own Traces (3 Minutes)

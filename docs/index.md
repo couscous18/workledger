@@ -17,6 +17,10 @@ uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
 uv run wl compare-costs --from-project .workledger/agent-cost
 ```
 
+PyPI is not published yet. The source-install path above is the only public install path we should advertise right now.
+
+![workledger demo screenshot](assets/workledger-demo-screenshot.png)
+
 Use it when you already have traces and want:
 
 - business-level work units instead of span soup
@@ -36,6 +40,7 @@ Principles:
 Start here:
 
 - [Proof Artifact](assets/builder-demo-report.html)
+- [Release Notes v0.1.0](releases/v0.1.0.md)
 - [Builder Demo](builder-demo.md)
 - [Getting Started](getting-started.md)
 - [How It Works](how-it-works.md)

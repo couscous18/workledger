@@ -17,7 +17,7 @@ This use case remains valuable because it shows how rollup, evidence, confidence
 
 ## Public Artifacts
 
-- [HF bundle README](../hf/software-capex-review/README.md)
-- [Synthetic example dataset](../hf/software-capex-review/dataset/software_capex_review_sample.jsonl)
-- [Gradio Space app](../hf/software-capex-review/space/app.py)
-- [Notebook demo](../hf/software-capex-review/notebook/workledger_capex_demo.ipynb)
+- [HF bundle README](https://github.com/couscous18/workledger/blob/main/hf/software-capex-review/README.md)
+- [Synthetic example dataset](https://raw.githubusercontent.com/couscous18/workledger/main/hf/software-capex-review/dataset/software_capex_review_sample.jsonl)
+- [Gradio Space app](https://github.com/couscous18/workledger/blob/main/hf/software-capex-review/space/app.py)
+- [Notebook demo](https://github.com/couscous18/workledger/blob/main/hf/software-capex-review/notebook/workledger_capex_demo.ipynb)
