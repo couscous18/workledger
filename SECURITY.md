@@ -40,6 +40,36 @@ The following are out of scope:
 
 We prefer coordinated disclosure when a maintainer is available to engage. Any timeline for disclosure or credit will be agreed case by case through the GitHub reporting thread.
 
+## Repository Protection
+
+This repository enforces the following safeguards:
+
+- **Branch protection on `main`**: Direct pushes are prohibited. All changes must go through a pull request.
+- **Required reviews**: At least one approving review from a code owner is required before merging.
+- **Required status checks**: CI must pass (lint, type-check, test) before a PR can merge.
+- **CODEOWNERS**: All file changes require review from `@couscous18`.
+- **Dependabot**: Enabled for automated dependency vulnerability alerts.
+- **Code scanning**: GitHub Advanced Security code scanning is enabled.
+- **Secret scanning**: Prevents accidental credential leaks in commits.
+
+### Setting up branch protection (maintainer checklist)
+
+These settings must be configured manually in **Settings → Branches → Branch protection rules** for `main`:
+
+1. ✅ Require a pull request before merging
+2. ✅ Require approvals (1)
+3. ✅ Require review from Code Owners
+4. ✅ Require status checks to pass before merging — add: `test`
+5. ✅ Require conversation resolution before merging
+6. ✅ Do not allow bypassing the above settings
+
+Under **Settings → Code security and analysis**, enable:
+
+1. ✅ Dependabot alerts
+2. ✅ Dependabot security updates
+3. ✅ Code scanning (CodeQL)
+4. ✅ Secret scanning
+
 ## Security Considerations
 
 workledger processes AI trace data that may contain sensitive information:
