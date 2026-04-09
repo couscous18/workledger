@@ -33,16 +33,17 @@ theme:
 
 nav:
   - Home: index.md
+  - Getting Started: getting-started.md
+  - Public Traces Demo: public-traces-demo.md
   - Open Traces: open-traces.md
   - Trace To Work: trace-to-work.md
-  - Public Traces Demo: public-traces-demo.md
-  - Getting Started: getting-started.md
-  - Builder Demo: builder-demo.md
   - Installation: installation.md
   - How It Works: how-it-works.md
   - CLI Reference: cli.md
   - Data Model: data-model.md
   - Adapters & Integrations: adapters.md
+  - FAQ: faq.md
+  - Builder Demo: builder-demo.md
   - Policy Packs: policy-packs.md
   - Framework Examples: framework-examples.md
   - Reporting: reporting.md
@@ -52,7 +53,6 @@ nav:
   - Schema Specification: schema-spec.md
   - Contributing Policies: contributing-policies.md
   - Release Notes (0.1.0): releases/v0.1.0.md
-  - FAQ: faq.md
 
 plugins:
   - search

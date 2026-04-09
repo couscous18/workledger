@@ -38,8 +38,9 @@ DemoNameArgument = Annotated[
     str,
     typer.Argument(
         help=(
-            "hf-gaia, hf-smoltrace, open-traces, agent-cost, capex, coding, "
-            "marketing, support, or all"
+            "hf-gaia, hf-smoltrace, open-traces (compatibility alias), "
+            "agent-cost (older synthetic name), capex, coding, marketing, "
+            "support, or all"
         )
     ),
 ]
