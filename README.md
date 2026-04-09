@@ -57,7 +57,7 @@ The flagship path is [`smolagents/gaia-traces`](https://huggingface.co/datasets/
 
 ![open traces before and after](docs/assets/open-traces-before-after.svg)
 
-[Open Traces](docs/open-traces.md) · [Trace To Work](docs/trace-to-work.md) · [Public Traces Demo](docs/public-traces-demo.md) · [Getting Started](docs/getting-started.md)
+[Open Traces](docs/open-traces.md) · [Trace To Work](docs/trace-to-work.md) · [Public Traces Demo](docs/public-traces-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
 
 ## Before / After
 
@@ -140,6 +140,8 @@ wl compare-costs --from-project .workledger/hf-smoltrace
 
 Synthetic demos, policy packs, and software capex review are still in the repo.
 They are now downstream examples of the same trace-to-work foundation, not the homepage story.
+
+The compatibility demo alias `wl demo open-traces` still works for the original synthetic coding path.
 
 ## Development
 

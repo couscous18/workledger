@@ -453,6 +453,7 @@ def support_demo_events() -> list[dict[str, Any]]:
 def demo_events(name: str) -> list[dict[str, Any]]:
     mapping = {
         "capex": coding_demo_events,
+        "open-traces": coding_demo_events,
         "agent-cost": coding_demo_events,
         "coding": coding_demo_events,
         "marketing": marketing_demo_events,
@@ -479,19 +480,17 @@ def run_demo(name: str, project_dir: Path, policy_path: Path | None = None) -> d
     config = WorkledgerConfig.from_project_dir(project_dir)
     pipeline = WorkledgerPipeline(config)
     raw_events_dir = config.raw_events_dir
-    policies_dir = config.policies_dir
     assert raw_events_dir is not None
-    assert policies_dir is not None
     input_path = write_demo_file(name, raw_events_dir / f"{name}.jsonl")
     ingest_result = pipeline.ingest(input_path)
     work_units = pipeline.rollup()
     policy_path = (
-        policies_dir / "software_capex_review_v1.yaml"
+        Path("software_capex_review_v1.yaml")
         if name == "capex" and policy_path is None
         else policy_path
     )
     classifications = pipeline.classify(policy_path)
-    include_economics = name in {"all", "agent-cost", "coding"}
+    include_economics = name in {"all", "open-traces", "agent-cost", "coding"}
     reports = pipeline.report(include_economics=include_economics)
     summary = pipeline.report_engine.summary(include_economics=include_economics)
     review_queue = pipeline.review_queue()

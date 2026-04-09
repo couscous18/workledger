@@ -42,6 +42,7 @@ wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
 Compatibility paths remain available:
 
 ```bash
+wl demo open-traces
 wl demo agent-cost
 wl demo all
 wl benchmark benchmark-data/software_capex_review_v1 --format markdown

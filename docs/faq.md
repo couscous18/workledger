@@ -10,7 +10,7 @@ It turns raw traces into `WorkUnit`s with evidence, lineage, and review-needed s
 
 ## Why lead with Hugging Face public datasets?
 
-Because public traces are now a practical way to show the missing layer between traces and work in the open-agent ecosystem.
+Because public traces are now a practical way to show the trace-to-work primitive in the open-agent ecosystem.
 
 ## Is economics still supported?
 

@@ -1,6 +1,6 @@
 # Software CapEx Review
 
-This page is intentionally downstream.
+This page is intentionally downstream. `workledger` can support software accounting review, but that sits on top of the broader trace-to-work layer.
 
 If you are new to the project, start with:
 

@@ -1,6 +1,6 @@
 # workledger software capex review bundle
 
-This bundle is a downstream example package for `workledger`, an agent work ledger for AI systems.
+This bundle is a downstream example package for `workledger`, an open trace-to-work layer for AI systems.
 
 The core thesis comes first: noisy AI traces in, reviewable `WorkUnit`s out.
 

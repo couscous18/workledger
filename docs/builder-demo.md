@@ -13,4 +13,10 @@ The synthetic builder path is still useful when you want a deterministic local d
 uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
 ```
 
+Optional follow-up economics view:
+
+```bash
+uv run wl compare-costs --from-project .workledger/agent-cost
+```
+
 Treat it as a compatibility demo, not the lead public narrative.

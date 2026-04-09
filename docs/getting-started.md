@@ -1,6 +1,6 @@
 # Getting Started
 
-`workledger` turns traces into understandable work.
+`workledger` is the open trace-to-work layer for AI systems. It turns traces into understandable work.
 
 ## Install
 
@@ -9,6 +9,8 @@ git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
 ```
+
+PyPI distribution is not live yet. Install from source from this repository.
 
 ## Quickstart: Public Traces To Work
 
@@ -49,5 +51,6 @@ uv run wl report --project-dir .workledger/hf-gaia
 You can still use:
 
 - `wl ingest` for JSON or JSONL traces
-- `wl demo agent-cost` for the original synthetic coding demo
+- `wl demo open-traces` as a compatibility alias for the original synthetic coding demo
+- `wl demo agent-cost` for the original synthetic coding demo name
 - `wl compare-costs` when you explicitly want downstream economics

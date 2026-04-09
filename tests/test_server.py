@@ -26,7 +26,7 @@ def test_review_queue_endpoint_empty_and_populated(tmp_path: Path) -> None:
 
     classify = client.post(
         "/classify",
-        params={"policy_path": str(Path("policies/software_capex_review_v1.yaml").resolve())},
+        params={"policy_path": "software_capex_review_v1.yaml"},
     )
     assert classify.status_code == 200
 
