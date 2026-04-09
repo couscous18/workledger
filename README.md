@@ -5,20 +5,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://couscous18.github.io/workledger/)
 
-`workledger` is the open work ledger for AI systems.
+`workledger` is the open trace-to-work layer for AI systems.
 
 **Observability tells you what ran. `workledger` tells you what work happened.**
 
-`workledger` turns raw traces, trajectories, and agent messages into `WorkUnit`s: durable, reviewable units of work with preserved evidence, lineage, and attached cost.
-
-It is the missing layer between execution records and the questions teams actually need to answer:
-
-- what work happened?
-- which work is expensive, ambiguous, or still needs review?
-- where should policy, accountability, or economics attach?
-
-Public traces are the easiest proof path for this idea, but the product is broader than open traces alone.
-`workledger` is the ledger layer that makes agent work legible.
+`workledger` turns raw traces, trajectories, and agent messages into `WorkUnit`s: the durable, reviewable primitive for understandable work, with preserved evidence and lineage.
+Public traces are the easiest way to prove that in the open, starting with Hugging Face datasets such as [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces) and [`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009).
+Economics, policy, and accounting stay downstream of that core trace-to-work attribution layer.
 
 ```text
 raw traces / messages / spans
@@ -27,23 +20,7 @@ raw traces / messages / spans
   -> review / policy / economics
 ```
 
-## Why Now
-
-Public trace datasets are starting to accumulate across the Hugging Face and open-agent ecosystem.
-That makes it possible to show the ledger layer in the open, with runnable evidence instead of hand-wavy claims.
-
-- [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces) gives a compact public messages/trajectory dataset
-- [`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009) gives trace-native `trace_id + spans + totals`
-- more public traces are becoming inspectable, comparable, and reproducible
-
-Those traces tell you what executed.
-They do not yet give you an open, adapter-friendly way to answer:
-
-- what understandable work happened?
-- which traces still need review because the work is ambiguous?
-- where should evidence, policy, accountability, or economics attach?
-
-## What You Can Run Right Away
+## Quickstart
 
 ```bash
 git clone https://github.com/couscous18/workledger.git
@@ -51,15 +28,25 @@ cd workledger
 uv sync --all-extras
 
 uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
-uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
+```
 
+Optional second run:
+
+```bash
+uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
+```
+
+Manual path from the same flagship dataset:
+
+```bash
 uv run wl ingest-hf smolagents/gaia-traces --adapter gaia --split train --limit 3 --seed 7 --project-dir .workledger/hf-gaia
 uv run wl rollup --project-dir .workledger/hf-gaia
 uv run wl report --project-dir .workledger/hf-gaia
 ```
 
+PyPI is not live for this release, so the public install path is source-first from this repository.
 The flagship path is [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces): public agent messages in, understandable `WorkUnit`s out.
-These demos are proof artifacts for the full work-ledger layer, not just trace viewers.
+[`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009) is the telemetry-native proof that the same model works for trace-and-span datasets too.
 
 ![open traces before and after](docs/assets/open-traces-before-after.svg)
 
@@ -75,9 +62,9 @@ Before:
 
 After:
 
-- a few `WorkUnit`s with title, type, status, review state, evidence count, lineage, and work-attached cost
-- review-required items where the trace does not cleanly resolve
-- cost attached to accountable work instead of only raw requests or spans
+- a few `WorkUnit`s with title, status, evidence, lineage, and review state
+- review-needed items where the trace does not cleanly resolve
+- optional downstream economics attached to accountable work instead of only raw requests or spans
 - a stable seam for adapters across public trace formats
 
 ## The Missing Primitive
@@ -89,7 +76,7 @@ Tracing backends and observability tools are good at preserving execution detail
 
 - `ObservationSpan` is the normalized execution record
 - `WorkUnit` is the durable, human-readable unit of work
-- evidence, lineage, direct cost, and allocated cost stay attached to that work
+- evidence and lineage stay attached to that work
 - review, policy, and economics are downstream interpretations on top of attributed work
 
 ## First-Class Public Datasets
@@ -124,7 +111,6 @@ Planned next:
 ## Why Builders Care
 
 - many spans can become a few understandable `WorkUnit`s
-- cost is attached to work, not just requests or token totals
 - ambiguity stays visible instead of getting flattened into fake certainty
 - evidence and lineage stay attached to each interpretation
 - review queues and policy outcomes stay grounded in the rolled work
@@ -148,8 +134,8 @@ wl compare-costs --from-project .workledger/hf-smoltrace
 
 ## Existing Downstream Paths
 
-Synthetic demos, policy packs, and software capex review are still in the repo.
-They are now downstream examples of the same trace-to-work foundation, not the homepage story.
+Synthetic demos, policy packs, comparative economics, and software capex review are still in the repo.
+They are downstream examples of the same trace-to-work foundation, not the homepage story.
 
 The compatibility demo alias `wl demo open-traces` still works for the original synthetic coding path.
 

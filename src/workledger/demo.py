@@ -1,4 +1,4 @@
-"""Synthetic trace generators for coding, marketing, and support scenarios."""
+"""Public Hugging Face demo runners plus synthetic trace generators."""
 
 from __future__ import annotations
 

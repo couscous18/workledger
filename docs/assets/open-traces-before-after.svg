@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
   <title id="title">Open traces before and after</title>
-  <desc id="desc">Many raw trace messages and spans on the left become a small set of understandable work units on the right.</desc>
+  <desc id="desc">Many raw trace messages and spans on the left become a small set of understandable WorkUnits with evidence, review state, and optional economics on the right.</desc>
   <defs>
     <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
       <stop offset="0%" stop-color="#f7f3e9"/>
@@ -40,7 +40,7 @@
 
   <rect x="708" y="168" width="500" height="472" rx="28" fill="url(#panel)" stroke="#c5d6cf" filter="url(#shadow)"/>
   <text x="744" y="218" font-size="28" font-family="Georgia, serif" fill="#0f766e">After: understandable work</text>
-  <text x="744" y="252" font-size="18" font-family="Menlo, monospace" fill="#3e4b55">rolled WorkUnits with evidence and review state</text>
+  <text x="744" y="252" font-size="18" font-family="Menlo, monospace" fill="#3e4b55">fewer WorkUnits with evidence, review, and optional cost</text>
 
   <g font-family="Menlo, monospace" font-size="17" fill="#18242b">
     <rect x="744" y="292" width="428" height="86" rx="18" fill="#ecf7f3" stroke="#9fc6b9"/>
@@ -55,7 +55,7 @@
 
     <rect x="744" y="508" width="428" height="86" rx="18" fill="#ecf7f3" stroke="#9fc6b9"/>
     <text x="766" y="538">title: return final answer</text>
-    <text x="766" y="562">type: reviewed_ai_work   cost/duration optional</text>
+    <text x="766" y="562">type: reviewed_ai_work   optional cost/duration</text>
     <text x="766" y="586">lineage preserved: hf://dataset/split/row#message</text>
   </g>
 </svg>

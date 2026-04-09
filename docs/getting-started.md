@@ -1,6 +1,6 @@
 # Getting Started
 
-`workledger` is the open trace-to-work layer for AI systems. It turns traces into understandable work.
+`workledger` is the open trace-to-work layer for AI systems. It turns public traces into understandable `WorkUnit`s.
 
 ## Install
 
@@ -10,9 +10,9 @@ cd workledger
 uv sync --all-extras
 ```
 
-PyPI distribution is not live yet. Install from source from this repository.
+PyPI is not live for this release. Install from source from this repository.
 
-## Quickstart: Public Traces To Work
+## Official First Run: `hf-gaia`
 
 ```bash
 uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
@@ -25,7 +25,7 @@ This is the flagship path:
 - a few understandable `WorkUnit`s
 - review-needed work where ambiguity remains
 
-## Second Demo: Trace-Native Spans
+## Optional Second Run: `hf-smoltrace`
 
 ```bash
 uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
@@ -38,7 +38,7 @@ This is the telemetry-native proof:
 - duration and cost remain attached
 - rollup makes the trace legible
 
-## Bring Your Own Public Dataset Sample
+## Manual Path From The Same Dataset
 
 ```bash
 uv run wl ingest-hf smolagents/gaia-traces --adapter gaia --split train --limit 3 --seed 7 --project-dir .workledger/hf-gaia
@@ -46,11 +46,13 @@ uv run wl rollup --project-dir .workledger/hf-gaia
 uv run wl report --project-dir .workledger/hf-gaia
 ```
 
-## Existing Non-Public Paths
+`wl report` does not include economics by default. Add `--include-economics` when you want that downstream view.
+
+## Existing Compatibility Paths
 
 You can still use:
 
 - `wl ingest` for JSON or JSONL traces
 - `wl demo open-traces` as a compatibility alias for the original synthetic coding demo
-- `wl demo agent-cost` for the original synthetic coding demo name
+- `wl demo agent-cost` as the older synthetic demo name
 - `wl compare-costs` when you explicitly want downstream economics

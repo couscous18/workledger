@@ -64,7 +64,7 @@ def create_app(config: WorkledgerConfig | None = None) -> FastAPI:
         for index, payload in enumerate(payloads, start=1):
             try:
                 spans.append(normalize_event(payload))
-            except (TypeError, ValueError, KeyError) as exc:
+            except (TypeError, ValueError, KeyError):
                 logger.warning(
                     "Failed to normalize event at line %d",
                     index,

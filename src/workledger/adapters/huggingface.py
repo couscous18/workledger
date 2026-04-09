@@ -11,7 +11,7 @@ from workledger.models import IngestResult, ObservationSpan, SourceKind, SpanKin
 try:
     from datasets import load_dataset
 except ImportError as exc:  # pragma: no cover - import guard
-    load_dataset = None  # type: ignore[assignment]
+    load_dataset = None
     _DATASETS_IMPORT_ERROR: ImportError | None = exc
 else:  # pragma: no cover - alias only
     _DATASETS_IMPORT_ERROR = None

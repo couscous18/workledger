@@ -96,7 +96,7 @@ warn_unused_configs = true
 plugins = []
 
 [[tool.mypy.overrides]]
-module = ["yaml"]
+module = ["yaml", "datasets"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
