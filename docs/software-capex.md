@@ -1,6 +1,6 @@
 # Software CapEx Review
 
-`workledger` can support software accounting review, but that is a downstream use case built on top of the broader agent work ledger.
+`workledger` can support software accounting review, but that is a downstream use case built on top of the broader trace-to-work layer.
 
 It takes ledgered software work and turns it into evidence-backed candidate classifications for finance and engineering.
 

@@ -1,6 +1,6 @@
 # Builder Demo
 
-`workledger` clicks fastest when you treat it as an agent work ledger, not a tracing dashboard.
+`workledger` clicks fastest when you treat it as an open trace-to-work layer, not a tracing dashboard.
 
 ![workledger before and after](assets/workledger-before-after.svg)
 
@@ -25,8 +25,8 @@ Run the flagship path locally:
 
 ```bash
 wl init --project-dir .workledger
-wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-wl compare-costs --from-project .workledger/agent-cost
+wl demo open-traces --project-dir .workledger/open-traces --open-report
+wl compare-costs --from-project .workledger/open-traces
 ```
 
 You should see:
@@ -34,6 +34,6 @@ You should see:
 - `3` work units with cost, evidence, and trust context
 - one pending review item: `Automate release checklist workflow`
 - one expensive product task that still needs interpretation, not hype
-- an HTML report at `.workledger/agent-cost/reports/summary.html`
+- an HTML report at `.workledger/open-traces/reports/summary.html`
 
-Software capex review is still in the repo, but it is a downstream interpretation of the same ledgered work. Start here for the primitive, then go to [Software CapEx Review](software-capex.md) if you want the accounting-facing example.
+Software capex review is still in the repo, but it is a downstream interpretation of the same trace-to-work layer. Start here for the primitive, then go to [Software CapEx Review](software-capex.md) if you want the accounting-facing example or the Hugging Face-ready publication bundle.

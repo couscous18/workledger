@@ -1,6 +1,6 @@
 site_name: workledger
 site_url: https://couscous18.github.io/workledger/
-site_description: Agent work ledger for AI systems
+site_description: Open trace-to-work layer for AI systems
 repo_url: https://github.com/couscous18/workledger
 repo_name: couscous18/workledger
 edit_uri: edit/main/docs/

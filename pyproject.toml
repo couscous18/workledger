@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "workledger"
 version = "0.1.0"
-description = "Turn AI traces into understandable units of work."
+description = "Open trace-to-work layer for AI systems."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -15,10 +15,12 @@ authors = [
 keywords = [
   "ai",
   "ai-agents",
+  "trace-to-work",
   "work-intelligence",
   "cost-attribution",
   "observability",
   "opentelemetry",
+  "openinference",
   "llmops",
   "duckdb",
 ]

@@ -6,11 +6,11 @@ No. The core product is trace compression plus work intelligence. Software capex
 
 ## What does it do that a trace viewer does not?
 
-It introduces `WorkUnit` as a ledger layer above raw traces. It rolls spans into units of work, adds cost and trust context, preserves review-worthy ambiguity, and compares deployment-economics scenarios on top of the same normalized data.
+It introduces `WorkUnit` as a trace-to-work layer above raw traces. It rolls spans into units of work, adds cost and trust context, preserves review-worthy ambiguity, and compares deployment-economics scenarios on top of the same normalized data.
 
-## Why lead with agent work ledger?
+## Why lead with trace-to-work?
 
-Because that is the most legible proof of the primitive. Once work is ledgered, the same foundation can support reporting, governance, policy packs, and software capex review.
+Because that is the sharpest description of the primitive. Once traces become reviewable work units, the same foundation can support reporting, governance, policy packs, Hugging Face-ready example bundles, and software capex review.
 
 ## Can it compare proprietary APIs with open or self-hosted models?
 

@@ -19,7 +19,7 @@ from workledger.policy import list_policy_packs, validate_policy_pack
 from workledger.review import apply_override
 from workledger.schema import write_schema_bundle
 
-app = typer.Typer(help="Turn AI agent traces into understandable units of work.")
+app = typer.Typer(help="Open trace-to-work CLI for AI systems.")
 policies_app = typer.Typer(help="Inspect and validate installed policy packs.")
 app.add_typer(policies_app, name="policies")
 console = Console()
@@ -35,7 +35,7 @@ TableArgument = Annotated[str, typer.Argument(help="Table to export")]
 FormatArgument = Annotated[str, typer.Argument(help="csv, parquet, or json")]
 DestinationArgument = Annotated[Path, typer.Argument(help="Output path")]
 DemoNameArgument = Annotated[
-    str, typer.Argument(help="agent-cost, capex, coding, marketing, support, or all")
+    str, typer.Argument(help="open-traces, agent-cost, capex, coding, marketing, support, or all")
 ]
 BenchmarkPathArgument = Annotated[
     Path, typer.Argument(exists=True, readable=True, help="Benchmark manifest or directory")

@@ -1,6 +1,6 @@
 # workledger
 
-`workledger` is an agent work ledger for AI systems.
+`workledger` is an open trace-to-work layer for AI systems.
 
 **Observability tells you what ran. `workledger` tells you what work happened.**
 
@@ -13,8 +13,8 @@ If you only try one thing, run:
 ```bash
 git clone https://github.com/couscous18/workledger.git && cd workledger
 uv sync --all-extras
-uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-uv run wl compare-costs --from-project .workledger/agent-cost
+uv run wl demo open-traces --project-dir .workledger/open-traces --open-report
+uv run wl compare-costs --from-project .workledger/open-traces
 ```
 
 PyPI is not published yet. The source-install path above is the only public install path we should advertise right now.
@@ -28,6 +28,7 @@ Use it when you already have traces and want:
 - explainable work classifications and policy outcomes
 - review queues for ambiguous work instead of fake certainty
 - side-by-side economics estimates for proprietary, open-hosted, and self-hosted assumptions
+- a public story that starts from open traces instead of opaque agent claims
 
 Principles:
 

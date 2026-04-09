@@ -1,6 +1,6 @@
 # Getting Started
 
-`workledger` is an agent work ledger for AI systems. It turns raw trace exhaust into `WorkUnit`s you can inspect, review, classify, and compare economically.
+`workledger` is an open trace-to-work layer for AI systems. It turns raw trace exhaust into `WorkUnit`s you can inspect, review, classify, and compare economically.
 
 ## Install
 
@@ -13,11 +13,11 @@ uv run wl init --project-dir .workledger
 
 > PyPI publishing is coming. For now, install from source.
 
-## Quickstart: Agent Work Ledger
+## Quickstart: Open Trace-to-Work
 
 ```bash
-uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-uv run wl compare-costs --from-project .workledger/agent-cost
+uv run wl demo open-traces --project-dir .workledger/open-traces --open-report
+uv run wl compare-costs --from-project .workledger/open-traces
 ```
 
 This flagship path shows the core thesis fastest:
@@ -26,6 +26,7 @@ This flagship path shows the core thesis fastest:
 - expensive or low-trust work is surfaced
 - ambiguous work lands in a review queue
 - deployment economics are compared with transparent assumptions
+- the same open traces can support downstream public packaging and policy-backed interpretation
 
 ## Explore More Demos
 

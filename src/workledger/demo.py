@@ -434,6 +434,7 @@ def support_demo_events() -> list[dict[str, Any]]:
 def demo_events(name: str) -> list[dict[str, Any]]:
     mapping = {
         "capex": coding_demo_events,
+        "open-traces": coding_demo_events,
         "agent-cost": coding_demo_events,
         "coding": coding_demo_events,
         "marketing": marketing_demo_events,
@@ -470,7 +471,7 @@ def run_demo(name: str, project_dir: Path, policy_path: Path | None = None) -> d
         else policy_path
     )
     classifications = pipeline.classify(policy_path)
-    include_economics = name in {"all", "agent-cost", "coding"}
+    include_economics = name in {"all", "open-traces", "agent-cost", "coding"}
     reports = pipeline.report(include_economics=include_economics)
     summary = pipeline.report_engine.summary(include_economics=include_economics)
     review_queue = pipeline.review_queue()

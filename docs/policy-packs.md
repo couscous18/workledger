@@ -11,4 +11,4 @@ Policy packs are YAML files that sit on top of the ledgered work layer. They def
 
 Rules evaluate extracted `WorkUnit` features, not raw telemetry volume alone.
 
-The flagship public story for the repo is the agent work ledger. Software capex review is a downstream example of what becomes possible once work has been rolled up into `WorkUnit`s with evidence and review state.
+The flagship public story for the repo is the trace-to-work layer. Software capex review is a downstream example of what becomes possible once work has been rolled up into `WorkUnit`s with evidence and review state.

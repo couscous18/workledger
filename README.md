@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://couscous18.github.io/workledger/)
 
-`workledger` is an agent work ledger for AI systems.
+`workledger` is an open trace-to-work layer for AI systems.
 
 **Observability tells you what ran. `workledger` tells you what work happened.**
 
@@ -19,8 +19,9 @@ AI traces are great at capturing execution, but teams still need a way to answer
 
 ## Who This Is For
 
-- Teams running AI agents that produce execution traces (OpenTelemetry, OpenInference, JSONL)
+- Teams running AI agents that already have traces and want a durable work layer on top
 - Engineers who need to answer "what work happened?" not just "what code ran?"
+- Builders publishing or sharing trace-backed demos, datasets, and proof artifacts
 - Finance and governance teams that need policy-backed classification of AI work
 
 ## Who This Is Not For
@@ -32,8 +33,8 @@ AI traces are great at capturing execution, but teams still need a way to answer
 ```bash
 git clone https://github.com/couscous18/workledger.git && cd workledger
 uv sync --all-extras
-uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-uv run wl compare-costs --from-project .workledger/agent-cost
+uv run wl demo open-traces --project-dir .workledger/open-traces --open-report
+uv run wl compare-costs --from-project .workledger/open-traces
 ```
 
 ![workledger demo screenshot](docs/assets/workledger-demo-screenshot.png)
@@ -42,9 +43,9 @@ uv run wl compare-costs --from-project .workledger/agent-cost
 
 ## The Missing Primitive
 
-Observability systems tell you about spans, tokens, models, and tools. They do not give you a durable ledger of work that a human can inspect, review, and reason about.
+Observability systems tell you about spans, tokens, models, and tools. They do not give you a durable trace-to-work layer that a human can inspect, review, and reason about.
 
-`WorkUnit` is that ledger layer.
+`WorkUnit` is that trace-to-work layer.
 
 ```text
 raw spans
@@ -86,8 +87,8 @@ git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
 uv run wl init --project-dir .workledger
-uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-uv run wl compare-costs --from-project .workledger/agent-cost
+uv run wl demo open-traces --project-dir .workledger/open-traces --open-report
+uv run wl compare-costs --from-project .workledger/open-traces
 ```
 
 > PyPI publishing is coming. For now, install from source.
@@ -98,7 +99,7 @@ uv run wl compare-costs --from-project .workledger/agent-cost
 - expensive or low-trust work surfaced in a way humans can inspect
 - a pending review queue instead of fake certainty
 - an economics comparison that separates observed usage from modeled assumptions
-- an HTML report at `.workledger/agent-cost/reports/summary.html`
+- an HTML report at `.workledger/open-traces/reports/summary.html`
 
 ### Broader Demo Bundle
 
@@ -142,6 +143,7 @@ uv run python examples/tiny_pipeline.py
 - management reporting on AI work by team or function
 - software capex review and other policy-backed downstream interpretations
 - exports and local analytics that stay grounded in canonical trace data
+- Hugging Face-ready downstream packaging, like the included software capex review bundle
 
 ## Comparative Economics
 
@@ -162,7 +164,7 @@ These scenarios are not benchmark claims. They are transparent, configurable ass
 - DuckDB-backed local analytical store with export support
 - CLI (`wl`) for init, ingest, rollup, classify, report, export, explain, demo, compare-costs, doctor, and policy validation
 - Local FastAPI server with OpenAPI docs and optional API-key auth
-- Runnable agent, marketing, and support demos, plus a software capex publication bundle as a downstream example
+- Runnable open-traces, marketing, and support demos, plus a Hugging Face-ready software capex bundle as a downstream example
 - JSON Schema export and published OpenAPI artifacts
 - CSV, JSON, Parquet, Markdown, and HTML report outputs
 
