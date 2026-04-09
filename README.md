@@ -5,27 +5,32 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://couscous18.github.io/workledger/)
 
-`workledger` is the open trace-to-work layer for AI systems.
+`workledger` is the open work ledger for AI systems.
 
 **Observability tells you what ran. `workledger` tells you what work happened.**
 
-Open-source AI is creating more public traces.
-What is missing is an open way to attribute those traces to work.
+`workledger` turns raw traces, trajectories, and agent messages into `WorkUnit`s: durable, reviewable units of work with preserved evidence, lineage, and attached cost.
 
-`workledger` turns raw traces, trajectories, and agent messages into `WorkUnit`s: smaller, reviewable units of work with preserved evidence, lineage, and explicit ambiguity.
+It is the missing layer between execution records and the questions teams actually need to answer:
 
-It is for builders who already have traces and need the missing layer between execution records and legible work.
+- what work happened?
+- which work is expensive, ambiguous, or still needs review?
+- where should policy, accountability, or economics attach?
+
+Public traces are the easiest proof path for this idea, but the product is broader than open traces alone.
+`workledger` is the ledger layer that makes agent work legible.
 
 ```text
 raw traces / messages / spans
-  -> normalized observations
-  -> rolled-up work units
-  -> review / classification / economics
+  -> normalized ObservationSpan
+  -> rolled-up WorkUnit
+  -> review / policy / economics
 ```
 
 ## Why Now
 
 Public trace datasets are starting to accumulate across the Hugging Face and open-agent ecosystem.
+That makes it possible to show the ledger layer in the open, with runnable evidence instead of hand-wavy claims.
 
 - [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces) gives a compact public messages/trajectory dataset
 - [`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009) gives trace-native `trace_id + spans + totals`
@@ -36,7 +41,7 @@ They do not yet give you an open, adapter-friendly way to answer:
 
 - what understandable work happened?
 - which traces still need review because the work is ambiguous?
-- where should evidence, policy, or economics attach?
+- where should evidence, policy, accountability, or economics attach?
 
 ## What You Can Run Right Away
 
@@ -54,6 +59,7 @@ uv run wl report --project-dir .workledger/hf-gaia
 ```
 
 The flagship path is [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces): public agent messages in, understandable `WorkUnit`s out.
+These demos are proof artifacts for the full work-ledger layer, not just trace viewers.
 
 ![open traces before and after](docs/assets/open-traces-before-after.svg)
 
@@ -69,8 +75,9 @@ Before:
 
 After:
 
-- a few `WorkUnit`s with title, type, status, review state, evidence count, lineage, and optional downstream cost
+- a few `WorkUnit`s with title, type, status, review state, evidence count, lineage, and work-attached cost
 - review-required items where the trace does not cleanly resolve
+- cost attached to accountable work instead of only raw requests or spans
 - a stable seam for adapters across public trace formats
 
 ## The Missing Primitive
@@ -81,8 +88,9 @@ Tracing backends and observability tools are good at preserving execution detail
 `workledger` sits one layer above them and preserves the part people actually need to reason about: the work.
 
 - `ObservationSpan` is the normalized execution record
-- `WorkUnit` is the rolled, human-readable unit of work
-- policy, review, and economics are downstream interpretations on top of attributed work
+- `WorkUnit` is the durable, human-readable unit of work
+- evidence, lineage, direct cost, and allocated cost stay attached to that work
+- review, policy, and economics are downstream interpretations on top of attributed work
 
 ## First-Class Public Datasets
 
@@ -100,9 +108,9 @@ Planned next:
 
 ## What `workledger` Is
 
-- an open trace-to-work attribution layer
+- an open trace-to-work attribution layer and work ledger
 - a bridge from public traces to `WorkUnit`
-- a local-first pipeline for normalization, rollup, review, and reporting
+- a local-first pipeline for normalization, rollup, review, reporting, and cost attribution
 - a small adapter seam for new trace ecosystems
 
 ## What `workledger` Is Not
@@ -116,8 +124,10 @@ Planned next:
 ## Why Builders Care
 
 - many spans can become a few understandable `WorkUnit`s
+- cost is attached to work, not just requests or token totals
 - ambiguity stays visible instead of getting flattened into fake certainty
 - evidence and lineage stay attached to each interpretation
+- review queues and policy outcomes stay grounded in the rolled work
 - public datasets become runnable demos instead of static artifacts
 - economics remain available, but as a downstream lens, not the thesis
 
