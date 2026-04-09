@@ -190,14 +190,14 @@ class WorkledgerPipeline:
         if policy_path is None:
             resolved_policy_path = (policies_root / "management_reporting_v1.yaml").resolve()
         else:
-            candidate = policy_path
-            if not candidate.is_absolute():
-                candidate = policies_root / candidate
-            resolved_policy_path = candidate.resolve()
-            try:
-                resolved_policy_path.relative_to(policies_root)
-            except ValueError as exc:
-                raise ValueError("policy_path must be within configured policies directory") from exc
+            if policy_path.is_absolute():
+                raise ValueError("policy_path must be relative to configured policies directory")
+            resolved_policy_path = (policies_root / policy_path).resolve()
+
+        try:
+            resolved_policy_path.relative_to(policies_root)
+        except ValueError as exc:
+            raise ValueError("policy_path must be within configured policies directory") from exc
 
         if not resolved_policy_path.is_file():
             raise ValueError(f"policy file not found: {resolved_policy_path}")
