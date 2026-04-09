@@ -44,9 +44,15 @@ def test_capex_report_includes_queue_and_compression_story(tmp_path: Path) -> No
     markdown = markdown_path.read_text(encoding="utf-8")
     html = html_path.read_text(encoding="utf-8")
 
+    assert "Dataset Context" in markdown
+    assert "Raw Trace Excerpt" in markdown
+    assert "Rolled Work Units" in markdown
+    assert "Review-Needed Work" in markdown
     assert "Cost by Policy Outcome" in markdown
     assert "Pending Review Queue" in markdown
     assert "Compression Proof Point" in markdown
+    assert "Dataset Context" in html
+    assert "Rolled Work Units" in html
     assert "Pending Review Queue" in html
     assert "Compression Proof Point" in html
 

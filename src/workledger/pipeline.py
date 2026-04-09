@@ -7,6 +7,10 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from workledger.adapters import (
+    HuggingFaceIngestResult,
+    adapt_huggingface_dataset,
+)
 from workledger.benchmark import BenchmarkResult, run_benchmark
 from workledger.config import WorkledgerConfig
 from workledger.ingest.loader import ingest_path
@@ -54,6 +58,52 @@ class WorkledgerPipeline:
             self.store.save_observation_spans(result.spans)
         logger.info("Ingested %d spans from %s (skipped %d)", result.ingested, path, result.skipped)
         return result
+
+    def ingest_huggingface(
+        self,
+        dataset_id: str,
+        *,
+        adapter_name: str = "auto",
+        split: str = "train",
+        limit: int | None = None,
+        seed: int = 7,
+    ) -> HuggingFaceIngestResult:
+        raw_events_dir = self.config.raw_events_dir
+        assert raw_events_dir is not None
+        bundle = adapt_huggingface_dataset(
+            dataset_id=dataset_id,
+            split=split,
+            adapter_name=adapter_name,
+            limit=limit,
+            seed=seed,
+        )
+        raw_path = raw_events_dir / f"{dataset_id.replace('/', '-')}-{split}.jsonl"
+        raw_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = "\n".join(json.dumps(row, sort_keys=True, default=str) for row in bundle.rows)
+        raw_path.write_text(payload + ("\n" if payload else ""), encoding="utf-8")
+        ingest_result = IngestResult(
+            ingested=len(bundle.spans),
+            skipped=0,
+            errors=[],
+            spans=bundle.spans,
+        )
+        if bundle.spans:
+            self.store.save_observation_spans(bundle.spans)
+        logger.info(
+            "Ingested %d spans from Hugging Face dataset %s[%s] using %s",
+            len(bundle.spans),
+            dataset_id,
+            split,
+            bundle.adapter_name,
+        )
+        return HuggingFaceIngestResult(
+            dataset_id=dataset_id,
+            split=split,
+            adapter_name=bundle.adapter_name,
+            row_count=len(bundle.rows),
+            raw_path=raw_path,
+            ingest=ingest_result,
+        )
 
     def ingest_payloads(self, payloads: list[dict[str, Any]]) -> IngestResult:
         raw_events_dir = self.config.raw_events_dir

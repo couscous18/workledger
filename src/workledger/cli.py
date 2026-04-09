@@ -35,8 +35,12 @@ TableArgument = Annotated[str, typer.Argument(help="Table to export")]
 FormatArgument = Annotated[str, typer.Argument(help="csv, parquet, or json")]
 DestinationArgument = Annotated[Path, typer.Argument(help="Output path")]
 DemoNameArgument = Annotated[
-    str, typer.Argument(help="agent-cost, capex, coding, marketing, support, or all")
+    str,
+    typer.Argument(
+        help="hf-gaia, hf-smoltrace, agent-cost, capex, coding, marketing, support, or all"
+    ),
 ]
+DatasetIdArgument = Annotated[str, typer.Argument(help="Public Hugging Face dataset ID")]
 BenchmarkPathArgument = Annotated[
     Path, typer.Argument(exists=True, readable=True, help="Benchmark manifest or directory")
 ]
@@ -60,6 +64,17 @@ ScenarioOption = Annotated[
     typer.Option("--scenario", help="Comparison preset to use. Repeatable."),
 ]
 FormatOption = Annotated[str, typer.Option("--format", help="table or json")]
+AdapterOption = Annotated[
+    str,
+    typer.Option("--adapter", help="auto, gaia, or smoltrace"),
+]
+SplitOption = Annotated[str, typer.Option(help="Dataset split to load")]
+SampleLimitOption = Annotated[int | None, typer.Option(help="Maximum rows to sample")]
+SeedOption = Annotated[int, typer.Option(help="Random seed for deterministic sampling")]
+IncludeEconomicsOption = Annotated[
+    bool,
+    typer.Option(help="Include comparative economics in generated report artifacts"),
+]
 
 
 def _pipeline(project_dir: Path) -> WorkledgerPipeline:
@@ -134,6 +149,33 @@ def ingest(
     pipeline.close()
 
 
+@app.command("ingest-hf")
+def ingest_hf(
+    dataset_id: DatasetIdArgument,
+    project_dir: ProjectDirOption = Path(".workledger"),
+    adapter: AdapterOption = "auto",
+    split: SplitOption = "train",
+    limit: SampleLimitOption = None,
+    seed: SeedOption = 7,
+) -> None:
+    """Ingest public Hugging Face trace datasets into normalized observations."""
+    pipeline = _pipeline(project_dir)
+    result = pipeline.ingest_huggingface(
+        dataset_id,
+        adapter_name=adapter,
+        split=split,
+        limit=limit,
+        seed=seed,
+    )
+    console.print(
+        f"Ingested [bold]{result.ingest.ingested}[/bold] spans from "
+        f"[bold]{result.dataset_id}[/bold] ([bold]{result.row_count}[/bold] rows, "
+        f"adapter [bold]{result.adapter_name}[/bold])."
+    )
+    console.print(f"Saved sampled rows to [bold]{result.raw_path}[/bold]")
+    pipeline.close()
+
+
 @app.command()
 def rollup(project_dir: ProjectDirOption = Path(".workledger")) -> None:
     """Roll up noisy spans into work units."""
@@ -186,10 +228,11 @@ def classify(
 @app.command()
 def report(
     project_dir: ProjectDirOption = Path(".workledger"),
+    include_economics: IncludeEconomicsOption = False,
 ) -> None:
     """Generate report artifacts and render a terminal summary."""
     pipeline = _pipeline(project_dir)
-    artifacts = pipeline.report(include_economics=True)
+    artifacts = pipeline.report(include_economics=include_economics)
     pipeline.report_engine.render_terminal(console)
     console.print("\nGenerated report artifacts:")
     for artifact in artifacts:
@@ -262,6 +305,11 @@ def demo(
     result = run_demo(name, project_dir, policy_path=policy_path)
     console.print(f"Demo [bold]{name}[/bold] complete.")
     console.print(f"Ingested data: [bold]{result['input_path']}[/bold]")
+    if "dataset_id" in result:
+        console.print(
+            f"Dataset: [bold]{result['dataset_id']}[/bold] via adapter "
+            f"[bold]{result['adapter_name']}[/bold]"
+        )
     console.print(
         "Generated "
         f"{len(result['work_units'])} work units and "

@@ -1,48 +1,44 @@
 # workledger
 
-`workledger` is an agent work ledger for AI systems.
+`workledger` is the open trace-to-work layer for AI systems.
 
 **Observability tells you what ran. `workledger` tells you what work happened.**
 
-![workledger before and after](assets/workledger-before-after.svg)
+![open traces before and after](assets/open-traces-before-after.svg)
 
-`workledger` introduces `WorkUnit` as the missing layer between span-level telemetry and the decisions teams actually need to make. It compresses raw traces into accountable units of work with evidence, review states, and transparent economics.
+Open-source AI is creating more public traces.
+What is missing is an open way to attribute those traces to work.
 
-If you only try one thing, run:
+`workledger` takes public traces, trajectories, and span trees and turns them into `WorkUnit`s: smaller units of work with evidence, lineage, and explicit review-needed states.
+
+Start with the public trace path:
 
 ```bash
 git clone https://github.com/couscous18/workledger.git && cd workledger
 uv sync --all-extras
-uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-uv run wl compare-costs --from-project .workledger/agent-cost
+uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
 ```
 
-PyPI is not published yet. The source-install path above is the only public install path we should advertise right now.
+Then try the telemetry-native companion demo:
 
-![workledger demo screenshot](assets/workledger-demo-screenshot.png)
+```bash
+uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
+```
 
-Use it when you already have traces and want:
+Use it when you want:
 
-- business-level work units instead of span soup
-- evidence-backed cost rollups
-- explainable work classifications and policy outcomes
-- review queues for ambiguous work instead of fake certainty
-- side-by-side economics estimates for proprietary, open-hosted, and self-hosted assumptions
-
-Principles:
-
-- compress noise into accountable work
-- preserve uncertainty instead of overstating certainty
-- keep evidence and lineage attached to interpretation
-- separate observed facts from modeled assumptions
-- stay open, inspectable, and local-first
+- an open bridge from traces to legible work
+- Hugging Face public traces turned into runnable, reviewable demos
+- adapter-friendly ingestion for new public trace formats
+- preserved evidence and lineage instead of opaque aggregation
+- economics as a downstream lens, not the lead story
 
 Start here:
 
-- [Proof Artifact](assets/builder-demo-report.html)
-- [Release Notes v0.1.0](releases/v0.1.0.md)
-- [Builder Demo](builder-demo.md)
+- [Open Traces](open-traces.md)
+- [Trace To Work](trace-to-work.md)
+- [Public Traces Demo](public-traces-demo.md)
 - [Getting Started](getting-started.md)
-- [How It Works](how-it-works.md)
+- [CLI Reference](cli.md)
 - [Comparative Economics](comparative-economics.md)
 - [Software CapEx Review](software-capex.md)

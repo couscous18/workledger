@@ -1,6 +1,6 @@
 # Getting Started
 
-`workledger` is an agent work ledger for AI systems. It turns raw trace exhaust into `WorkUnit`s you can inspect, review, classify, and compare economically.
+`workledger` turns traces into understandable work.
 
 ## Install
 
@@ -8,30 +8,46 @@
 git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
-uv run wl init --project-dir .workledger
 ```
 
-> PyPI distribution is not live yet. Install from source for now.
-
-## Quickstart: Agent Work Ledger
+## Quickstart: Public Traces To Work
 
 ```bash
-uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-uv run wl compare-costs --from-project .workledger/agent-cost
+uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
 ```
 
-This flagship path shows the core thesis fastest:
+This is the flagship path:
 
-- many spans become a few understandable `WorkUnit`s
-- expensive or low-trust work is surfaced
-- ambiguous work lands in a review queue
-- deployment economics are compared with transparent assumptions
+- public Hugging Face messages in
+- normalized observations out
+- a few understandable `WorkUnit`s
+- review-needed work where ambiguity remains
 
-## Explore More Demos
+## Second Demo: Trace-Native Spans
 
 ```bash
-wl demo all --project-dir .workledger/demo --open-report
-wl compare-costs --from-project .workledger/demo
+uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
 ```
 
-Use this broader bundle if you want coding, marketing, and support examples after the flagship agent workflow.
+This is the telemetry-native proof:
+
+- many spans are not yet work
+- explicit span hierarchy is preserved
+- duration and cost remain attached
+- rollup makes the trace legible
+
+## Bring Your Own Public Dataset Sample
+
+```bash
+uv run wl ingest-hf smolagents/gaia-traces --adapter gaia --split train --limit 3 --seed 7 --project-dir .workledger/hf-gaia
+uv run wl rollup --project-dir .workledger/hf-gaia
+uv run wl report --project-dir .workledger/hf-gaia
+```
+
+## Existing Non-Public Paths
+
+You can still use:
+
+- `wl ingest` for JSON or JSONL traces
+- `wl demo agent-cost` for the original synthetic coding demo
+- `wl compare-costs` when you explicitly want downstream economics
