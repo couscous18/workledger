@@ -18,13 +18,13 @@ class FakeDataset:
     def __init__(self, rows: list[dict[str, Any]]) -> None:
         self.rows = rows
 
-    def shuffle(self, seed: int) -> "FakeDataset":
+    def shuffle(self, seed: int) -> FakeDataset:
         if not self.rows:
             return self
         shift = seed % len(self.rows)
         return FakeDataset(self.rows[shift:] + self.rows[:shift])
 
-    def select(self, indexes: range) -> "FakeDataset":
+    def select(self, indexes: range) -> FakeDataset:
         return FakeDataset([self.rows[index] for index in indexes])
 
     def __len__(self) -> int:
