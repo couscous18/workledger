@@ -11,7 +11,7 @@ uv sync --all-extras
 uv run wl init --project-dir .workledger
 ```
 
-> PyPI publishing is coming. For now, install from source.
+> PyPI distribution is not live yet. Install from source for now.
 
 ## Quickstart: Agent Work Ledger
 
