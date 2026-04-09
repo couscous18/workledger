@@ -182,9 +182,30 @@ class WorkledgerPipeline:
     ) -> BenchmarkResult:
         return run_benchmark(dataset_path, policy_path=policy_path)
 
+    def _sanitize_policy_path(self, policy_path: Path) -> Path:
+        if policy_path.is_absolute():
+            raise ValueError("policy_path must be relative to configured policies directory")
+        if any(part in ("", ".", "..") for part in policy_path.parts):
+            raise ValueError("policy_path contains invalid path segments")
+        return policy_path
+
     def _load_policy(self, policy_path: Path | None) -> PolicyPack:
+        policies_dir = self.config.policies_dir
+        assert policies_dir is not None
+        policies_root = policies_dir.resolve()
+
         if policy_path is None:
-            policies_dir = self.config.policies_dir
-            assert policies_dir is not None
-            policy_path = policies_dir / "management_reporting_v1.yaml"
-        return load_policy_pack(policy_path)
+            resolved_policy_path = (policies_root / "management_reporting_v1.yaml").resolve()
+        else:
+            safe_policy_path = self._sanitize_policy_path(policy_path)
+            resolved_policy_path = (policies_root / safe_policy_path).resolve()
+
+        try:
+            resolved_policy_path.relative_to(policies_root)
+        except ValueError as exc:
+            raise ValueError("policy_path must be within configured policies directory") from exc
+
+        if not resolved_policy_path.is_file():
+            raise ValueError(f"policy file not found: {resolved_policy_path}")
+
+        return load_policy_pack(resolved_policy_path)
