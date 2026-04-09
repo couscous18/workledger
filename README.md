@@ -90,7 +90,7 @@ uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
 uv run wl compare-costs --from-project .workledger/agent-cost
 ```
 
-> PyPI publishing is coming. For now, install from source.
+> PyPI distribution is not live yet. Install from source for now.
 
 ### What You Should See
 
