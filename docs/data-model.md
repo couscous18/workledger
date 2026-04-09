@@ -13,6 +13,7 @@ Core objects:
 ## ObservationSpan
 
 `ObservationSpan` is the normalized execution record.
+It preserves what the source system observed before any higher-level attribution happens.
 
 Key fields:
 
@@ -33,10 +34,15 @@ It groups multiple observations into one understandable unit of work that a huma
 Key fields:
 
 - `title`, `summary`, `objective`
+- `actor`, `actor_kind`, `project`, `team`, `cost_center`
 - `review_state`, `trust_state`
 - `direct_cost`, `allocated_cost`, `total_cost`
 - `source_span_ids`, `compression_ratio`
 - `evidence_bundle`, `lineage_refs`
+- `labels`, `facets`, `source_systems`
+
+This is where `workledger` stops being a trace viewer and becomes a ledger:
+cost, evidence, and ambiguity are attached to accountable work instead of to disconnected events.
 
 ## ClassificationTrace
 
@@ -44,11 +50,19 @@ Key fields:
 
 It is useful, but it is not the core contribution. The trace-to-work attribution happens before this layer.
 
+Key fields:
+
+- `policy_basis`, `work_category`, `policy_outcome`
+- `cost_category`, `direct_cost`, `indirect_cost`, `blended_cost`
+- `confidence_score`, `evidence_score`, `evidence_strength`
+- `reviewer_required`, `reviewer_status`, `override_status`
+- `decisions` for explainable policy outcomes
+
 ## Relationship
 
 ```mermaid
 flowchart LR
   A["ObservationSpan"] --> B["WorkUnit"]
   B --> C["ClassificationTrace"]
-  C --> D["PolicyDecision"]
+  C --> D["PolicyDecision / Review / Economics"]
 ```
