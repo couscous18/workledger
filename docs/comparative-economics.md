@@ -1,23 +1,25 @@
 # Comparative Economics
 
-WorkLedger measures AI work directly and estimates alternative deployment economics transparently.
+Comparative economics remains useful, but it is downstream of trace-to-work attribution.
 
-## What WorkLedger Measures
+`workledger` first answers:
 
-- observed input and output token counts
-- observed direct inference cost when traces provide it
-- work-unit and classification context
+- what work happened?
+- how much evidence supports that interpretation?
+- which items still need review?
 
-## What WorkLedger Estimates
+Only after that does `wl compare-costs` estimate alternative deployment costs.
 
-`wl compare-costs` estimates what the same workload might cost under configurable scenarios such as:
+## What It Measures
 
-- proprietary API
-- open hosted inference
-- self-hosted GPU inference
+- observed token usage from normalized observations
+- direct cost when the source trace provides it
+- work-unit context for the rolled workload
 
-These estimates are derived from token totals plus editable assumptions. They are not benchmark claims.
+## What It Estimates
 
-## Important Caveat
+- proprietary API assumptions
+- open-hosted assumptions
+- self-hosted GPU assumptions
 
-“Self-hosted is cheaper” is not universally true. It depends on utilization, batching efficiency, operator overhead, GPU reservation waste, latency targets, and model quality requirements.
+These estimates are explicit, editable, and secondary to the core trace-to-work model.

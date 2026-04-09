@@ -118,7 +118,7 @@ class RollupEngine:
             direct_cost=direct_cost,
             allocated_cost=round(direct_cost * self.config.allocated_cost_multiplier, 6),
             evidence_bundle=evidence,
-            lineage_refs=[f"trace:{sorted_spans[0].trace_id}", f"group:{group_key}"],
+            lineage_refs=self._build_lineage_refs(group_key, sorted_spans),
             source_span_ids=[span.span_id for span in sorted_spans],
             compression_ratio=compression_ratio,
             labels=labels,
@@ -154,4 +154,23 @@ class RollupEngine:
                     source_system="trace",
                 )
             )
+        for span in spans:
+            if span.raw_payload_ref:
+                evidence.append(
+                    EvidenceRef(
+                        evidence_kind="source_trace_ref",
+                        uri=span.raw_payload_ref,
+                        preview=span.name,
+                        source_system=str(span.source_kind),
+                    )
+                )
         return evidence
+
+    def _build_lineage_refs(self, group_key: str, spans: list[ObservationSpan]) -> list[str]:
+        refs = [f"trace:{spans[0].trace_id}", f"group:{group_key}"]
+        refs.extend(
+            span.raw_payload_ref
+            for span in spans
+            if span.raw_payload_ref
+        )
+        return sorted(set(refs))

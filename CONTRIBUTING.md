@@ -30,10 +30,10 @@ pre-commit install
 make ci
 ```
 
-### Run the demo
+### Run the flagship demo
 
 ```bash
-uv run wl demo all --project-dir .workledger/demo --open-report
+uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
 ```
 
 ## Development Loop
@@ -61,7 +61,28 @@ make ci        # lint + test (same as CI)
 - **Prefer extension facets over bloating core models.** The facet system exists for domain-specific metadata.
 - **Preserve explainability.** Rollup and policy changes must produce traceable, auditable decisions.
 - **Add or update fixtures** for every behavior change in rollup or classification.
-- **Treat accounting outputs as candidate interpretations, never certainty.** This is a design principle, not a suggestion.
+- **Preserve lineage.** Public trace adapters must keep stable source refs in `raw_payload_ref`.
+- **Treat accounting outputs as downstream interpretations, never the core claim.**
+
+## Adding A Public Trace Adapter
+
+Keep adapters small and explicit.
+
+Minimum expectations:
+
+- map source rows into `ObservationSpan`
+- preserve source lineage in `raw_payload_ref`
+- use namespaced `facets` for adapter-specific metadata
+- keep review-needed ambiguity visible instead of flattening it away
+- add fixture-driven tests
+- add a demo-sized path that can run on a small public sample
+
+Recommended mapping:
+
+- stable dataset metadata in `facets["hf"]` or another source namespace
+- source row or message/span IDs in `raw_payload_ref`
+- `work_unit_key` when a source row should become a single rolled work candidate
+- `attributes["review_required"]` when the trace shape is ambiguous
 
 ## Pull Requests
 

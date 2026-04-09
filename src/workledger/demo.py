@@ -11,6 +11,25 @@ from workledger import WorkledgerConfig, WorkledgerPipeline
 from workledger.models import SpanKind
 from workledger.utils.ids import new_id
 
+HF_DEMOS: dict[str, dict[str, Any]] = {
+    "hf-gaia": {
+        "dataset_id": "smolagents/gaia-traces",
+        "adapter": "gaia",
+        "split": "train",
+        "limit": 3,
+        "seed": 7,
+        "include_economics": False,
+    },
+    "hf-smoltrace": {
+        "dataset_id": "kshitijthakkar/smoltrace-traces-20260130_053009",
+        "adapter": "smoltrace",
+        "split": "train",
+        "limit": 3,
+        "seed": 7,
+        "include_economics": False,
+    },
+}
+
 
 def _event(
     *,
@@ -455,6 +474,8 @@ def write_demo_file(name: str, destination: Path) -> Path:
 
 
 def run_demo(name: str, project_dir: Path, policy_path: Path | None = None) -> dict[str, Any]:
+    if name in HF_DEMOS:
+        return run_hf_demo(name, project_dir, policy_path=policy_path)
     config = WorkledgerConfig.from_project_dir(project_dir)
     pipeline = WorkledgerPipeline(config)
     raw_events_dir = config.raw_events_dir
@@ -478,6 +499,37 @@ def run_demo(name: str, project_dir: Path, policy_path: Path | None = None) -> d
     return {
         "input_path": str(input_path),
         "ingest": ingest_result.model_dump(mode="json"),
+        "work_units": [item.model_dump(mode="json") for item in work_units],
+        "classifications": [item.model_dump(mode="json") for item in classifications],
+        "reports": [item.model_dump(mode="json") for item in reports],
+        "summary": summary,
+        "review_queue": review_queue,
+    }
+
+
+def run_hf_demo(name: str, project_dir: Path, policy_path: Path | None = None) -> dict[str, Any]:
+    config = WorkledgerConfig.from_project_dir(project_dir)
+    pipeline = WorkledgerPipeline(config)
+    demo = HF_DEMOS[name]
+    ingest_result = pipeline.ingest_huggingface(
+        demo["dataset_id"],
+        adapter_name=demo["adapter"],
+        split=demo["split"],
+        limit=demo["limit"],
+        seed=demo["seed"],
+    )
+    work_units = pipeline.rollup()
+    classifications = pipeline.classify(policy_path) if policy_path is not None else []
+    reports = pipeline.report(include_economics=bool(demo["include_economics"]))
+    summary = pipeline.report_engine.summary(include_economics=bool(demo["include_economics"]))
+    review_queue = pipeline.review_queue()
+    pipeline.close()
+    return {
+        "dataset_id": ingest_result.dataset_id,
+        "adapter_name": ingest_result.adapter_name,
+        "split": ingest_result.split,
+        "input_path": str(ingest_result.raw_path),
+        "ingest": ingest_result.ingest.model_dump(mode="json"),
         "work_units": [item.model_dump(mode="json") for item in work_units],
         "classifications": [item.model_dump(mode="json") for item in classifications],
         "reports": [item.model_dump(mode="json") for item in reports],

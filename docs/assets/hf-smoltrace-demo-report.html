@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>workledger report</title>
+    <style>
+      :root {
+        --bg: #f2efe8;
+        --ink: #1e2430;
+        --accent: #0f766e;
+        --panel: #fffdf8;
+        --muted: #6b7280;
+        --border: #d9d2c3;
+      }
+      body {
+        margin: 0;
+        font-family: "Iowan Old Style", "Palatino Linotype", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top right, rgba(15, 118, 110, 0.16), transparent 34%),
+          linear-gradient(180deg, #f8f5ef 0%, var(--bg) 100%);
+      }
+      main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+      }
+      .hero {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+      .hero strong {
+        color: var(--accent);
+        font-size: 1.05rem;
+        letter-spacing: 0.02em;
+      }
+      .sub {
+        color: var(--muted);
+        max-width: 58rem;
+        margin-bottom: 0;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+      }
+      .card, section {
+        background: rgba(255, 253, 248, 0.88);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 10px 28px rgba(30, 36, 48, 0.06);
+      }
+      .card {
+        padding: 20px;
+      }
+      .label {
+        color: var(--muted);
+        font-size: 0.86rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .value {
+        font-size: 1.8rem;
+        margin-top: 8px;
+      }
+      section {
+        padding: 20px 24px;
+        margin-bottom: 24px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      td, th {
+        padding: 12px 8px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        color: var(--muted);
+        font-size: 0.84rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>workledger</h1>
+      <div class="hero">
+        <strong>Observability tells you what ran. workledger tells you what work happened.</strong>
+        <p class="sub">This report turns raw traces into normalized observations, rolled work units, and explicit review-needed work. Policy and economics remain downstream views.</p>
+      </div>
+      <div class="cards"><div class='card'><div class='label'>work_unit_count</div><div class='value'>2</div></div><div class='card'><div class='label'>total_direct_cost</div><div class='value'>0.084</div></div><div class='card'><div class='label'>total_blended_cost</div><div class='value'>0.0966</div></div><div class='card'><div class='label'>avg_compression_ratio</div><div class='value'>1.12</div></div><div class='card'><div class='label'>avg_confidence</div><div class='value'>0.0</div></div><div class='card'><div class='label'>review_burden</div><div class='value'>1</div></div><div class='card'><div class='label'>pending_review_count</div><div class='value'>1</div></div><div class='card'><div class='label'>total_source_spans</div><div class='value'>8</div></div></div>
+      <section>
+        <h2>Dataset Context</h2>
+        <table>
+          <thead><tr><th>Dataset</th><th>Split</th><th>Adapter</th><th>Rows</th><th>Traces</th><th>Observations</th></tr></thead>
+          <tbody><tr><td>kshitijthakkar/smoltrace-traces-20260130_053009</td><td>train</td><td>smoltrace</td><td>2</td><td>2</td><td>8</td></tr></tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Raw Trace Excerpt</h2>
+        <table>
+          <thead><tr><th>Title</th><th>Trace</th><th>Steps</th><th>Excerpt</th><th>Source ref</th></tr></thead>
+          <tbody><tr><td>Work through multi-step prompt</td><td>trace-smol-2</td><td>5</td><td>Work through multi-step prompt -&gt; Retrieve docs -&gt; Run calculator -&gt; Reason over docs -&gt; Return answer</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/1#span-1</td></tr><tr><td>Solve benchmark prompt</td><td>trace-smol-1</td><td>3</td><td>Solve benchmark prompt -&gt; Search background facts -&gt; Draft final answer</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/0#span-1</td></tr></tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Normalized Observations</h2>
+        <table>
+          <thead><tr><th>Trace</th><th>Span</th><th>Kind</th><th>Name</th><th>Source ref</th></tr></thead>
+          <tbody><tr><td>trace-smol-2</td><td>root-2</td><td>agent</td><td>Work through multi-step prompt</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/1#span-1</td></tr><tr><td>trace-smol-2</td><td>retrieve-2</td><td>retriever</td><td>Retrieve docs</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/1#span-2</td></tr><tr><td>trace-smol-2</td><td>tool-2</td><td>tool</td><td>Run calculator</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/1#span-3</td></tr><tr><td>trace-smol-2</td><td>llm-2a</td><td>llm</td><td>Reason over docs</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/1#span-4</td></tr><tr><td>trace-smol-2</td><td>llm-2b</td><td>llm</td><td>Return answer</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/1#span-5</td></tr><tr><td>trace-smol-1</td><td>root-1</td><td>agent</td><td>Solve benchmark prompt</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/0#span-1</td></tr><tr><td>trace-smol-1</td><td>tool-1</td><td>tool</td><td>Search background facts</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/0#span-2</td></tr><tr><td>trace-smol-1</td><td>llm-1</td><td>llm</td><td>Draft final answer</td><td>hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/0#span-3</td></tr></tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Rolled Work Units</h2>
+        <table>
+          <thead><tr><th>Title</th><th>Kind</th><th>Review</th><th>Trust</th><th>Evidence</th><th>Spans</th><th>Total cost</th></tr></thead>
+          <tbody><tr><td>Work through multi-step prompt</td><td>augmented_ai_work</td><td>queued</td><td>unreviewed</td><td>6</td><td>5</td><td>$0.0644</td></tr><tr><td>Solve benchmark prompt</td><td>augmented_ai_work</td><td>unreviewed</td><td>unreviewed</td><td>4</td><td>3</td><td>$0.0322</td></tr></tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Review-Needed Work</h2>
+        <table>
+          <thead><tr><th>Title</th><th>Kind</th><th>Review</th><th>Reason</th><th>Spans</th><th>Evidence</th></tr></thead>
+          <tbody><tr><td>Work through multi-step prompt</td><td>augmented_ai_work</td><td>queued</td><td>queued during trace-to-work rollup</td><td>5</td><td>6</td></tr></tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Cost by Policy Outcome</h2>
+        <table>
+          <thead><tr><th>Policy outcome</th><th>Blended cost</th><th>Work units</th></tr></thead>
+          <tbody><tr><td colspan='3'>No policy outcome totals available</td></tr></tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Pending Review Queue</h2>
+        <table>
+          <thead><tr><th>Title</th><th>Category</th><th>Outcome</th><th>Cost</th><th>Confidence</th><th>Spans</th><th>Compression</th><th>Competing</th></tr></thead>
+          <tbody><tr><td colspan='8'>No pending review items</td></tr></tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Compression Proof Point</h2>
+        <p><strong>Work through multi-step prompt</strong> condensed 5 source spans into a 1.25x business work signal.</p>
+      </section>
+      <section>
+        <h2>Top Ambiguous Items</h2>
+        <table>
+          <thead><tr><th>Title</th><th>Category</th><th>Confidence</th><th>Gap</th></tr></thead>
+          <tbody><tr><td colspan='4'>No ambiguous items</td></tr></tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Low-Trust High-Cost Outputs</h2>
+        <table>
+          <thead><tr><th>Title</th><th>Category</th><th>Cost</th><th>Trust</th></tr></thead>
+          <tbody><tr><td colspan='4'>No low-trust high-cost outputs</td></tr></tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

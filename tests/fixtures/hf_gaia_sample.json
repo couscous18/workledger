@@ -1,0 +1,22 @@
+[
+  {
+    "task": "Find the country that uses the CFA franc in Central Africa.",
+    "model_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+    "system_prompt": "Solve the task and explain the answer briefly.",
+    "final_answer": "Cameroon uses the Central African CFA franc.",
+    "messages": [
+      {"role": "system", "content": "Solve the task and explain the answer briefly."},
+      {"role": "user", "content": "Find the country that uses the CFA franc in Central Africa."},
+      {"role": "assistant", "content": "I should identify countries in the Central African CFA franc zone."},
+      {"role": "assistant", "content": "Cameroon uses the Central African CFA franc."}
+    ]
+  },
+  {
+    "task": "Summarize the result of the search in one sentence.",
+    "model_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+    "messages": [
+      {"role": "user", "content": "Summarize the result of the search in one sentence."},
+      {"role": "assistant", "content": ""}
+    ]
+  }
+]

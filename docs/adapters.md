@@ -1,27 +1,31 @@
 # Adapters & Integrations
 
-V1 supports normalization from:
+Adapters normalize source traces into `ObservationSpan`.
 
-- OpenTelemetry-like span JSON
-- OpenInference-like span JSON
-- CloudEvents JSON
-- raw JSONL batches
-- SDK-emitted canonical span payloads
+Current built-ins:
 
-Adapters normalize into `ObservationSpan` before rollup and policy evaluation.
+- `gaia`
+  maps message / trajectory rows such as `smolagents/gaia-traces`
+- `smoltrace`
+  maps trace / span rows such as `kshitijthakkar/smoltrace-traces-20260130_053009`
+- existing JSON and JSONL normalization for OpenTelemetry-like, OpenInference-like, CloudEvents, and SDK-shaped traces
 
-## JSONL
+## Adapter Design
 
-Each line should be a single event object. Malformed lines are skipped and reported during ingest instead of crashing the full batch.
+The adapter seam is intentionally small:
 
-## OpenInference-Like
+- detect or choose a source shape
+- map source rows into `ObservationSpan`
+- preserve lineage in `raw_payload_ref`
+- attach dataset-specific metadata in namespaced `facets`
 
-Provide `trace_id`, `span_id`, `start_time`, `end_time`, and optional token and cost fields.
+## Hugging Face Lineage
 
-## OpenTelemetry-Like
+Public dataset rows are preserved with refs like:
 
-Provide `traceId`, `spanId`, timing fields, and attributes such as `llm.model_name`, `llm.token_count.prompt`, and `llm.cost.usd`.
+```text
+hf://smolagents/gaia-traces/train/0#message-2
+hf://kshitijthakkar/smoltrace-traces-20260130_053009/train/1#span-3
+```
 
-## SDK Events
-
-If you control the instrumentation code, canonical SDK-shaped events are the simplest path because they map directly into WorkLedger’s normalized schema.
+Those refs then stay attached to evidence and `WorkUnit.lineage_refs`.
