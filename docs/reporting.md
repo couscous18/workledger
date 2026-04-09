@@ -8,14 +8,19 @@ The default report bundle writes:
 - `summary.md`
 - `summary.html`
 
-The HTML report is intended to be screenshot-friendly for internal review, demos, and shareable proof that many traces became a few understandable work units.
+The report now leads with trace-to-work sections:
 
-Common sections include:
+- dataset context
+- raw trace excerpt
+- normalized observations
+- rolled work units
+- review-needed work
 
-- cost by policy outcome
-- pending review queue
-- top ambiguous items
+After that it can include:
+
+- pending review queue from policy classification
+- ambiguity summaries
 - compression proof point
-- low-trust high-cost outputs
+- downstream economics, only when enabled
 
-When economics comparison is enabled, the report bundle also includes a comparative economics section that contrasts observed spend with transparent open-hosted and self-hosted assumptions.
+`wl report` does not include economics by default. Use `wl report --include-economics` when you want that secondary view.

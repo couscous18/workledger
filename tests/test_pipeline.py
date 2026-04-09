@@ -62,7 +62,7 @@ def test_override_updates_explanation_hint_and_primary_decision(tmp_path: Path) 
     input_path = write_demo_file("capex", config.raw_events_dir / "capex.jsonl")
     pipeline.ingest(input_path)
     pipeline.rollup()
-    pipeline.classify(config.policies_dir / "software_capex_review_v1.yaml")
+    pipeline.classify(Path("software_capex_review_v1.yaml"))
     queue = pipeline.review_queue()
 
     override = apply_override(

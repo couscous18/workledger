@@ -65,7 +65,12 @@ def create_app(config: WorkledgerConfig | None = None) -> FastAPI:
             try:
                 spans.append(normalize_event(payload))
             except (TypeError, ValueError, KeyError) as exc:
-                errors.append({"line": index, "error": str(exc)})
+                logger.warning(
+                    "Failed to normalize event at line %d",
+                    index,
+                    exc_info=True,
+                )
+                errors.append({"line": index, "error": "invalid event payload"})
         if spans:
             pipeline.store.save_observation_spans(spans)
         logger.info("Ingested %d events via API (skipped %d)", len(spans), len(errors))
@@ -89,7 +94,12 @@ def create_app(config: WorkledgerConfig | None = None) -> FastAPI:
 
     @protected.post("/classify", dependencies=[Depends(verify_api_key)])
     def run_classify(policy_path: str | None = None) -> list[dict[str, Any]]:
-        policy = Path(policy_path) if policy_path else None
+        policy: Path | None = None
+        if policy_path:
+            candidate = Path(policy_path)
+            if candidate.is_absolute() or ".." in candidate.parts:
+                raise HTTPException(status_code=400, detail="invalid policy_path")
+            policy = candidate
         return [trace.model_dump(mode="json") for trace in pipeline.classify(policy)]
 
     @protected.get("/work-units", dependencies=[Depends(verify_api_key)])

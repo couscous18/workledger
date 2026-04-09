@@ -5,179 +5,150 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://couscous18.github.io/workledger/)
 
-`workledger` is an open trace-to-work layer for AI systems.
+`workledger` is the open trace-to-work layer for AI systems.
 
 **Observability tells you what ran. `workledger` tells you what work happened.**
 
-AI traces are great at capturing execution, but teams still need a way to answer higher-level questions:
+Open-source AI is creating more public traces.
+What is missing is an open way to attribute those traces to work.
 
-- What did the agent actually accomplish?
-- Which work was expensive, low-trust, or review-worthy?
-- Where should we attach policy, accountability, or economics?
+`workledger` turns raw traces, trajectories, and agent messages into `WorkUnit`s: smaller, reviewable units of work with preserved evidence, lineage, and explicit ambiguity.
 
-`workledger` introduces `WorkUnit` as the missing layer between span-level telemetry and business or governance decisions. Feed in OpenTelemetry, OpenInference, JSONL, or SDK events. Get back reviewable units of work with cost, evidence, policy context, and transparent economics.
-
-## Who This Is For
-
-- Teams running AI agents that already have traces and want a durable work layer on top
-- Engineers who need to answer "what work happened?" not just "what code ran?"
-- Builders publishing or sharing trace-backed demos, datasets, and proof artifacts
-- Finance and governance teams that need policy-backed classification of AI work
-
-## Who This Is Not For
-
-- Generic application analytics or APM replacement
-- A tracing backend — workledger consumes traces, it doesn't collect them
-- Production-ready systems (this is alpha, expect breaking changes)
-
-```bash
-git clone https://github.com/couscous18/workledger.git && cd workledger
-uv sync --all-extras
-uv run wl demo open-traces --project-dir .workledger/open-traces --open-report
-uv run wl compare-costs --from-project .workledger/open-traces
-```
-
-![workledger demo screenshot](docs/assets/workledger-demo-screenshot.png)
-
-[See Proof Artifact](docs/assets/builder-demo-report.html) · [Builder Demo](docs/builder-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
-
-## The Missing Primitive
-
-Observability systems tell you about spans, tokens, models, and tools. They do not give you a durable trace-to-work layer that a human can inspect, review, and reason about.
-
-`WorkUnit` is that trace-to-work layer.
+It is for builders who already have traces and need the missing layer between execution records and legible work.
 
 ```text
-raw spans
+raw traces / messages / spans
   -> normalized observations
   -> rolled-up work units
-  -> classification traces
-  -> review, reporting, and economics
+  -> review / classification / economics
 ```
 
-That lets builders move from "what executed?" to questions like:
+## Why Now
 
-- What did this agent run add up to?
-- Which outputs were expensive but still low-trust?
-- Which items need human review instead of fake certainty?
-- How would this workload look under open-hosted or self-hosted assumptions?
+Public trace datasets are starting to accumulate across the Hugging Face and open-agent ecosystem.
 
-## Why Builders Care
+- [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces) gives a compact public messages/trajectory dataset
+- [`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009) gives trace-native `trace_id + spans + totals`
+- more public traces are becoming inspectable, comparable, and reproducible
 
-- Many spans become a few understandable `WorkUnit`s
-- Cost is attached to work, not just raw requests
-- Ambiguity stays visible through a review queue
-- Evidence and lineage stay attached to every interpretation
-- Economics remain transparent and assumption-driven, not benchmark theater
+Those traces tell you what executed.
+They do not yet give you an open, adapter-friendly way to answer:
 
-## Principles
+- what understandable work happened?
+- which traces still need review because the work is ambiguous?
+- where should evidence, policy, or economics attach?
 
-- Compress noise into accountable work
-- Preserve uncertainty instead of overstating certainty
-- Keep evidence and lineage attached to every interpretation
-- Separate observed facts from modeled assumptions
-- Stay open, inspectable, and local-first by default
-
-## 60-Second Quickstart
-
-### Install from source
+## What You Can Run Right Away
 
 ```bash
 git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
-uv run wl init --project-dir .workledger
-uv run wl demo open-traces --project-dir .workledger/open-traces --open-report
-uv run wl compare-costs --from-project .workledger/open-traces
+
+uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
+uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
+
+uv run wl ingest-hf smolagents/gaia-traces --adapter gaia --split train --limit 3 --seed 7 --project-dir .workledger/hf-gaia
+uv run wl rollup --project-dir .workledger/hf-gaia
+uv run wl report --project-dir .workledger/hf-gaia
 ```
 
-> PyPI publishing is coming. For now, install from source.
+The flagship path is [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces): public agent messages in, understandable `WorkUnit`s out.
 
-### What You Should See
+![open traces before and after](docs/assets/open-traces-before-after.svg)
 
-- many raw spans compressed into a smaller set of `WorkUnit`s
-- expensive or low-trust work surfaced in a way humans can inspect
-- a pending review queue instead of fake certainty
-- an economics comparison that separates observed usage from modeled assumptions
-- an HTML report at `.workledger/open-traces/reports/summary.html`
+[Open Traces](docs/open-traces.md) · [Trace To Work](docs/trace-to-work.md) · [Public Traces Demo](docs/public-traces-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
 
-### Broader Demo Bundle
+## Before / After
 
-If you want the multi-team demo set after the flagship agent path:
+Before:
+
+- many raw messages, steps, spans, and tool calls
+- plenty of observability detail
+- unclear boundaries for the actual work
+
+After:
+
+- a few `WorkUnit`s with title, type, status, review state, evidence count, lineage, and optional downstream cost
+- review-required items where the trace does not cleanly resolve
+- a stable seam for adapters across public trace formats
+
+## The Missing Primitive
+
+`WorkUnit` is the public primitive in `workledger`.
+
+Tracing backends and observability tools are good at preserving execution detail.
+`workledger` sits one layer above them and preserves the part people actually need to reason about: the work.
+
+- `ObservationSpan` is the normalized execution record
+- `WorkUnit` is the rolled, human-readable unit of work
+- policy, review, and economics are downstream interpretations on top of attributed work
+
+## First-Class Public Datasets
+
+Supported now:
+
+- [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces)
+  message / trajectory shape
+- [`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009)
+  trace / spans / totals shape
+
+Planned next:
+
+- [`smolagents/codeagent-traces`](https://huggingface.co/datasets/smolagents/codeagent-traces)
+  documented as a future adapter target, not yet implemented
+
+## What `workledger` Is
+
+- an open trace-to-work attribution layer
+- a bridge from public traces to `WorkUnit`
+- a local-first pipeline for normalization, rollup, review, and reporting
+- a small adapter seam for new trace ecosystems
+
+## What `workledger` Is Not
+
+- an APM product
+- a tracing backend
+- a generic eval framework
+- a reasoning-trace viewer
+- enterprise compliance software with OSS paint on top
+
+## Why Builders Care
+
+- many spans can become a few understandable `WorkUnit`s
+- ambiguity stays visible instead of getting flattened into fake certainty
+- evidence and lineage stay attached to each interpretation
+- public datasets become runnable demos instead of static artifacts
+- economics remain available, but as a downstream lens, not the thesis
+
+## CLI Surface
 
 ```bash
-uv run wl demo all --project-dir .workledger/demo --open-report
-uv run wl compare-costs --from-project .workledger/demo
+wl ingest traces.jsonl
+wl ingest-hf smolagents/gaia-traces --adapter gaia --split train --limit 3 --seed 7
+wl rollup
+wl classify
+wl report
+wl demo hf-gaia
+wl demo hf-smoltrace
+wl compare-costs --from-project .workledger/hf-smoltrace
 ```
 
-### Bring Your Own Traces (3 Minutes)
+`wl report` no longer includes economics by default. Add `--include-economics` when you want that downstream view.
 
-Already have OpenTelemetry JSON exports? Try this:
+## Existing Downstream Paths
+
+Synthetic demos, policy packs, and software capex review are still in the repo.
+They are now downstream examples of the same trace-to-work foundation, not the homepage story.
+
+The compatibility demo alias `wl demo open-traces` still works for the original synthetic coding path.
+
+## Development
 
 ```bash
-uv run wl init --project-dir .workledger/my-traces
-uv run wl ingest .workledger/my-traces your-traces.json --format otel
-uv run wl rollup .workledger/my-traces
-uv run wl classify .workledger/my-traces
-uv run wl report .workledger/my-traces --format html --open
+make lint
+make test
+make docs
 ```
 
-Supported formats: `otel`, `openinference`, `jsonl`, `cloudevents`, `sdk`
-
-### Tiny Python Example
-
-```bash
-uv run python examples/tiny_pipeline.py
-```
-
-## Why This Is a New Layer
-
-- It rolls many spans into a unit you can actually reason about: `WorkUnit`
-- It adds explainable, policy-backed interpretation on top of raw traces
-- It preserves ambiguity with a review queue when confidence is not high enough
-- It compares deployment options with explicit assumptions instead of hiding the math
-
-## What Becomes Possible Once Work Is Ledgered
-
-- agent cost analysis and review burden tracking
-- management reporting on AI work by team or function
-- software capex review and other policy-backed downstream interpretations
-- exports and local analytics that stay grounded in canonical trace data
-- Hugging Face-ready downstream packaging, like the included software capex review bundle
-
-## Comparative Economics
-
-`wl compare-costs` uses observed token totals from ingested work and compares them against editable scenario presets:
-
-- `proprietary_api`
-- `open_hosted`
-- `self_hosted_gpu`
-
-These scenarios are not benchmark claims. They are transparent, configurable assumptions layered on top of the canonical trace and work-unit data.
-
-## V1 Includes
-
-- Canonical models for `ObservationSpan`, `WorkUnit`, `ClassificationTrace`, `PolicyDecision`, `EvidenceRef`, `PolicyPack`, and `ReportArtifact`
-- Ingestion for JSONL, OpenInference-like payloads, OTEL-like JSON, CloudEvents JSON, and direct SDK-shaped events
-- Rollup engine that compresses low-level spans into human-reviewable work units
-- Declarative policy pack engine with explainable rule matches and review-required states
-- DuckDB-backed local analytical store with export support
-- CLI (`wl`) for init, ingest, rollup, classify, report, export, explain, demo, compare-costs, doctor, and policy validation
-- Local FastAPI server with OpenAPI docs and optional API-key auth
-- Runnable open-traces, marketing, and support demos, plus a Hugging Face-ready software capex bundle as a downstream example
-- JSON Schema export and published OpenAPI artifacts
-- CSV, JSON, Parquet, Markdown, and HTML report outputs
-
-## Architecture
-
-```mermaid
-flowchart LR
-  A["OpenTelemetry / OpenInference / JSONL / CloudEvents / SDK"] --> B["Normalization<br/>ObservationSpan"]
-  B --> C["Rollup Engine<br/>WorkUnit"]
-  C --> D["Policy Engine<br/>ClassificationTrace + PolicyDecision"]
-  D --> E["DuckDB + Parquet"]
-  E --> F["CLI / API / Reports / Exports"]
-  E --> G["Comparative Economics"]
-  C --> H["Evidence Bundle + Lineage"]
-  D --> I["Review Queue + Overrides"]
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for adapter and fixture guidance.

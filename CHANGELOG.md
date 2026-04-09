@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- First-class open trace workflow centered on Hugging Face public datasets, including `wl ingest-hf`, `wl demo hf-gaia`, and `wl demo hf-smoltrace`
+- Public trace adapters for `smolagents/gaia-traces` and `kshitijthakkar/smoltrace-traces-20260130_053009`
+- Report sections that foreground dataset context, raw trace excerpts, normalized observations, rolled `WorkUnit`s, and review-needed work
+- New docs for the open-traces story: open traces, trace-to-work, and the public-traces demo path
 - Optional `ObservationSpan.token_taxes` support for employer-style token tax metadata, including jurisdiction, rate, taxable token count, and tax amount
 - GitHub release workflow that builds sdist and wheel artifacts and publishes them to the Releases page when a `v*` tag is pushed
 - `wl demo open-traces` alias for the flagship public demo path
