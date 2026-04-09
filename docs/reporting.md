@@ -1,6 +1,6 @@
 # Reporting
 
-The default report bundle writes:
+`wl report` writes a fixed report bundle into the project `reports/` directory:
 
 - `summary.json`
 - `cost_by_work_category.csv`
@@ -8,9 +8,11 @@ The default report bundle writes:
 - `summary.md`
 - `summary.html`
 
-The reports are meant to prove the ledger layer, not just echo the source trace.
+The report engine reads from the local DuckDB store. It can render useful output after ingest and rollup alone, but some sections only populate after classification.
 
-They lead with trace-to-work sections:
+## Sections The Reports Generate Today
+
+Always available when data exists:
 
 - dataset context
 - raw trace excerpt
@@ -18,20 +20,29 @@ They lead with trace-to-work sections:
 - rolled work units
 - review-needed work
 
-Then they show the downstream views that are already supported in the code:
+Available after `wl classify` has produced `ClassificationTrace` rows:
 
 - pending review queue from policy classification
 - ambiguity summaries
 - compression proof point
 - top material work units
-- cost by work category
 - cost by policy outcome
+- cost by work category
 - low-trust high-cost items
-- downstream economics, only when enabled
+
+Available only when `--include-economics` is passed:
+
+- comparative economics
+
+## Other Output Surfaces
+
+- `wl report` also renders a terminal summary
+- `wl export` can export any known table as CSV, Parquet, or JSON
+- `wl explain` prints a stored work unit or classification as JSON
 
 ## What The Reports Make Legible
 
-The default bundle shows:
+The current bundle is designed to show:
 
 - how raw trace records were normalized into `ObservationSpan`
 - how many observations were rolled into each `WorkUnit`
@@ -43,5 +54,4 @@ The default bundle shows:
 `classification_traces.parquet` preserves the downstream attribution layer for local analysis.
 `summary.md` and `summary.html` present the same narrative in human-readable form.
 
-`wl report` does not include economics by default. Use `wl report --include-economics` when you want that secondary view.
-That keeps the core report focused on attributed work while still making comparative economics a first-class supported option.
+`classification_traces.parquet` is still written even if you have not classified anything yet; in that case it simply reflects the empty downstream layer.
