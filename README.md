@@ -7,6 +7,8 @@
 
 `workledger` is a Python CLI and local pipeline for turning AI trace data into normalized observations, rolled units of work, and optional policy, review, report, and cost-analysis outputs.
 
+In plain English: it helps you turn messy agent traces into human-reviewable units of work so you can see what happened, what it cost, and what may need review.
+
 The core implemented flow today is:
 
 - `ObservationSpan`: normalized trace/message/span record
@@ -48,6 +50,7 @@ JSON / JSONL / OpenInference / OTEL / CloudEvents / SDK events / supported HF da
 The best no-network end-to-end path in the repo is the local coding demo:
 
 ```bash
+# prerequisites: Python 3.11+ and uv (https://docs.astral.sh/uv/getting-started/installation/)
 git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
