@@ -1,31 +1,19 @@
 # Open Traces
 
-Open-source AI is producing more public traces.
+Public traces are one supported input family in `workledger`, not the whole repository story.
 
-That matters because traces are now becoming shareable artifacts and proof surfaces:
+They matter here because they are easy-to-share test cases for the normalize-and-rollup pipeline:
 
 - agent messages
 - trajectories
 - span trees
 - token and cost totals
 
-What is still missing is an open way to turn those traces into accountable work.
+The implemented contribution is still the same:
 
-`workledger` fills that gap by normalizing traces into `ObservationSpan`s and rolling them into `WorkUnit`s with evidence, lineage, review states, and work-attached cost.
-
-## Why Public Traces Matter
-
-Public traces make the trace-to-work problem inspectable in the open.
-
-They let builders see, end to end:
-
-- what the source trace looked like
-- how that trace was normalized
-- how multiple steps were grouped into understandable work
-- where ambiguity stayed visible instead of being hidden
-
-That makes public traces the best entrypoint for the repo.
-They are the proof path, not the whole product story.
+- normalize source records into `ObservationSpan`
+- roll them into `WorkUnit`
+- optionally classify and report on those work units
 
 ## Supported Public Dataset Shapes
 
@@ -35,38 +23,24 @@ They are the proof path, not the whole product story.
 | kshitijthakkar/smoltrace-traces-20260130_053009 | https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009 | trace + spans | supported | yes |
 | smolagents/codeagent-traces | https://huggingface.co/datasets/smolagents/codeagent-traces | messages / outcomes | planned | no |
 
-## Why Traces Alone Are Not Enough
+## What The Current Adapters Actually Do
 
-Traces preserve execution detail.
-They do not, by themselves, tell you:
-
-- which steps belong to one understandable unit of work
-- where ambiguity should stay visible
-- how evidence should stay attached to interpretation
-- how cost should be attributed to the work, not just the underlying calls
+- `gaia` maps a message-style row into one root span plus per-message spans
+- `smoltrace` maps trace-and-span rows into span-preserving `ObservationSpan`
+- both preserve Hugging Face lineage in `raw_payload_ref`
+- both populate dataset metadata in `facets["hf"]`
 
 ## What `workledger` Adds After Ingestion
 
-`workledger` does not stop at showing the trace.
-It adds the ledger layer on top of the trace:
-
 - `ObservationSpan` as the normalized execution record
-- `WorkUnit` as the durable unit of work people can inspect
-- evidence bundles and lineage refs for reviewability
-- direct cost, allocated cost, and total cost attached to rolled work
-- review, policy, and economics as downstream interpretations
+- `WorkUnit` as the rolled unit of work people can inspect
+- evidence bundles and lineage refs
+- direct and allocated cost attached to rolled work
+- optional review, policy, and economics layers after rollup
 
 ## How `workledger` Fits
 
-`workledger` is not a tracing backend.
-It is the attribution layer between public traces and legible work.
-
-That makes it useful to:
-
-- agent builders
-- telemetry builders
-- Hugging Face dataset users
-- teams trying to make agent work reviewable
+`workledger` is not a trace viewer or tracing backend. In this repo, public traces are just one way to feed the same local pipeline.
 
 ## Adding More Adapters
 

@@ -1,9 +1,8 @@
 # Public Traces Demo
 
-This is the official public demo path for the repo.
-It shows the core thesis in the open: many public traces are not yet understandable work, and `workledger` is the layer that rolls them into legible `WorkUnit`s.
+This is the optional public-trace path in the repo. It demonstrates the implemented Hugging Face adapters and shows how public rows become normalized observations and rolled work units.
 
-## Flagship Demo: `smolagents/gaia-traces`
+## GAIA Messages
 
 Run:
 
@@ -11,20 +10,21 @@ Run:
 uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
 ```
 
-This demo uses public message traces and shows:
+This demo uses the `gaia` adapter and shows:
 
 - raw messages in
 - normalized observations
 - a few rolled `WorkUnit`s
-- review-needed work where the trace is ambiguous
 - preserved Hugging Face lineage refs
+
+By default this demo does not run `wl classify`.
 
 Artifact:
 
 - [GAIA demo report](assets/hf-gaia-demo-report.html)
 - Dataset: [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces)
 
-## Telemetry-Native Demo: `smoltrace`
+## smoltrace Spans
 
 Run:
 
@@ -32,7 +32,7 @@ Run:
 uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
 ```
 
-This demo leans into native span hierarchy:
+This demo uses the `smoltrace` adapter and leans into native span hierarchy:
 
 - `trace_id + spans` ingestion
 - duration and cost totals preserved
@@ -48,4 +48,11 @@ Artifact:
 ![open traces before and after](assets/open-traces-before-after.svg)
 
 The important change is not better observability.
-It is trace-to-work attribution with `WorkUnit` as the primitive.
+It is normalization plus rollup, with `WorkUnit` as the main output.
+
+If you want policy output after running a public demo, run classification explicitly:
+
+```bash
+uv run wl classify --project-dir .workledger/hf-gaia
+uv run wl report --project-dir .workledger/hf-gaia
+```

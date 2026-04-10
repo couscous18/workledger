@@ -1,6 +1,6 @@
 # Data Model
 
-Core objects:
+The implemented model layer revolves around these core objects:
 
 - `ObservationSpan`
 - `WorkUnit`
@@ -12,24 +12,23 @@ Core objects:
 
 ## ObservationSpan
 
-`ObservationSpan` is the normalized execution record.
-It preserves what the source system observed before any higher-level attribution happens.
+`ObservationSpan` is the normalized ingestion record. Every supported input path maps into this object before anything else happens.
 
 Key fields:
 
-- `source_kind`, now including `huggingface`
+- `source_kind`
 - `trace_id`, `span_id`, `parent_span_id`
 - `span_kind`, `name`, `start_time`, `end_time`
 - `token_input`, `token_output`, `direct_cost`
+- `token_taxes` for optional token-tax metadata
 - `attributes` for mapped source fields
-- `facets` for namespaced metadata such as `hf.*` or `smoltrace.*`
+- `facets` for namespaced metadata such as `hf`, `smoltrace`, `git`, `marketing`, or `support`
 - `raw_payload_ref` for source lineage such as `hf://dataset/split/row#message-2`
+- `work_unit_key` for sources that already expose a useful rollup boundary
 
 ## WorkUnit
 
-`WorkUnit` is the missing primitive.
-
-It groups multiple observations into one understandable unit of work that a human can inspect, review, and attach downstream interpretation to.
+`WorkUnit` is the main primitive in this repository. It groups one or more observations into a unit a person can inspect, review, and reason about.
 
 Key fields:
 
@@ -41,14 +40,11 @@ Key fields:
 - `evidence_bundle`, `lineage_refs`
 - `labels`, `facets`, `source_systems`
 
-This is where `workledger` stops being a trace viewer and becomes a ledger:
-cost, evidence, and ambiguity are attached to accountable work instead of to disconnected events.
+This is where raw execution detail becomes accountable work.
 
 ## ClassificationTrace
 
-`ClassificationTrace` is a downstream interpretation of one `WorkUnit`.
-
-It is useful, but it is not the core contribution. The trace-to-work attribution happens before this layer.
+`ClassificationTrace` is a downstream interpretation of one `WorkUnit`. It exists only after `wl classify` runs.
 
 Key fields:
 
@@ -58,11 +54,19 @@ Key fields:
 - `reviewer_required`, `reviewer_status`, `override_status`
 - `decisions` for explainable policy outcomes
 
+## Supporting Objects
+
+- `PolicyDecision`: one rule match or default policy decision
+- `EvidenceRef`: evidence stored inside a `WorkUnit`
+- `PolicyPack`: YAML-loaded ruleset for `wl classify`
+- `PolicyRun`: summary row for one classification run
+- `ReportArtifact`: persisted reference to a generated report file
+
 ## Relationship
 
 ```mermaid
 flowchart LR
   A["ObservationSpan"] --> B["WorkUnit"]
-  B --> C["ClassificationTrace"]
-  C --> D["PolicyDecision / Review / Economics"]
+  B --> C["Optional ClassificationTrace"]
+  C --> D["Review queue / reports / exports / economics"]
 ```

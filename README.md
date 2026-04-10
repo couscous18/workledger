@@ -5,139 +5,200 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://couscous18.github.io/workledger/)
 
-`workledger` is the open trace-to-work layer for AI systems.
+`workledger` is a Python CLI and local pipeline for turning AI trace data into normalized observations, rolled units of work, and optional policy, review, report, and cost-analysis outputs.
 
-**Observability tells you what ran. `workledger` tells you what work happened.**
+The core implemented flow today is:
 
-`workledger` turns raw traces, trajectories, and agent messages into `WorkUnit`s: the durable, reviewable primitive for understandable work, with preserved evidence and lineage.
-Public traces are the easiest way to prove that in the open, starting with Hugging Face datasets such as [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces) and [`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009).
-Economics, policy, and accounting stay downstream of that core trace-to-work attribution layer.
+- `ObservationSpan`: normalized trace/message/span record
+- `WorkUnit`: rolled-up unit of work with evidence, lineage, review state, and cost
+- `ClassificationTrace`: optional policy-backed interpretation of a `WorkUnit`
+
+The repository is source-first and alpha. It primarily ships a local DuckDB-backed pipeline, plus a FastAPI server, JSON Schema/OpenAPI artifacts, small observation emitters, synthetic demos, and two Hugging Face dataset adapters.
 
 ```text
-raw traces / messages / spans
-  -> normalized ObservationSpan
-  -> rolled-up WorkUnit
-  -> review / policy / economics
+JSON / JSONL / OpenInference / OTEL / CloudEvents / SDK events / supported HF datasets
+  -> ObservationSpan
+  -> WorkUnit
+  -> optional ClassificationTrace
+  -> reports / review queue / exports / comparative economics
 ```
 
-## Quickstart
+## What This Repo Contains
+
+- `src/workledger/`: the main pipeline, models, ingestion, rollup, policy, reporting, storage, review, and economics code
+- `src/workledger_server/`: a FastAPI wrapper around the same local pipeline
+- `src/workledger_observe/` and `packages/sdk/`: helpers for emitting canonical observation events
+- `policies/`: built-in YAML policy packs
+- `benchmark-data/`: a labeled benchmark suite for the software capex policy pack
+- `examples/`: tiny and framework-oriented examples
+- `schemas/`: generated JSON Schema and OpenAPI artifacts
+
+## Core Primitive
+
+`WorkUnit` is the main object this repository introduces.
+
+`ObservationSpan` is the ingestion boundary. It preserves source trace identity, timestamps, token counts, direct cost, lineage, and source-specific metadata.
+
+`WorkUnit` is the rollup boundary. It groups related observations into something a human can inspect: title, summary, objective, evidence bundle, lineage refs, source span IDs, review/trust state, and rolled cost.
+
+`ClassificationTrace` is downstream of that. It attaches rule-based policy outcomes, confidence, evidence strength, and review requirements to an already-rolled `WorkUnit`.
+
+## Recommended First Run
+
+The best no-network end-to-end path in the repo is the local coding demo:
 
 ```bash
 git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
 
-uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
+uv run wl demo coding --project-dir .workledger/coding --open-report
 ```
 
-Optional second run:
+That command:
+
+- writes synthetic SDK-style observation events into `.workledger/coding/raw/`
+- ingests them into a local DuckDB project
+- rolls them into `WorkUnit`s
+- classifies them with the built-in management reporting policy pack
+- writes terminal, JSON, CSV, Parquet, Markdown, and HTML report outputs
+- prints the generated HTML report path when `--open-report` is set
+
+If you want the smallest Python example instead of the full CLI flow:
 
 ```bash
-uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
+uv run python examples/tiny_pipeline.py
 ```
 
-Manual path from the same flagship dataset:
+## Optional Public Trace Demos
+
+The repo also includes optional Hugging Face ingestion for two implemented dataset shapes:
 
 ```bash
 uv run wl ingest-hf smolagents/gaia-traces --adapter gaia --split train --limit 3 --seed 7 --project-dir .workledger/hf-gaia
 uv run wl rollup --project-dir .workledger/hf-gaia
 uv run wl report --project-dir .workledger/hf-gaia
+
+uv run wl ingest-hf kshitijthakkar/smoltrace-traces-20260130_053009 --adapter smoltrace --split train --limit 3 --seed 7 --project-dir .workledger/hf-smoltrace
+uv run wl rollup --project-dir .workledger/hf-smoltrace
+uv run wl report --project-dir .workledger/hf-smoltrace
 ```
 
-PyPI is not live for this release, so the public install path is source-first from this repository.
-The flagship path is [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces): public agent messages in, understandable `WorkUnit`s out.
-[`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009) is the telemetry-native proof that the same model works for trace-and-span datasets too.
+Or via demos:
 
-![open traces before and after](docs/assets/open-traces-before-after.svg)
+```bash
+uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
+uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
+```
 
-[Open Traces](docs/open-traces.md) · [Trace To Work](docs/trace-to-work.md) · [Public Traces Demo](docs/public-traces-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
+Important: the Hugging Face demos ingest, roll up, and report by default. They do **not** automatically run policy classification unless you explicitly run `wl classify` afterward or pass a policy into the underlying demo helper.
 
-## Before / After
+## Inputs Supported Today
 
-Before:
+`wl ingest` supports `.json` and `.jsonl` files containing:
 
-- many raw messages, steps, spans, and tool calls
-- plenty of observability detail
-- unclear boundaries for the actual work
+- canonical SDK-shaped observation events
+- OpenInference-like payloads with `trace_id` / `span_id`
+- OTEL-style JSON spans with `traceId` / `spanId`
+- CloudEvents whose `data` contains either canonical SDK payloads or OpenInference-like payloads
 
-After:
+`wl ingest-hf` supports only these implemented adapters:
 
-- a few `WorkUnit`s with title, status, evidence, lineage, and review state
-- review-needed items where the trace does not cleanly resolve
-- optional downstream economics attached to accountable work instead of only raw requests or spans
-- a stable seam for adapters across public trace formats
+- `gaia` for message-style rows such as [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces)
+- `smoltrace` for trace-and-span rows such as [`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009)
 
-## The Missing Primitive
+The REST API exposes the same ingestion boundary through `/ingest/events` and `/ingest/spans`.
 
-`WorkUnit` is the public primitive in `workledger`.
+## Outputs Produced Today
 
-Tracing backends and observability tools are good at preserving execution detail.
-`workledger` sits one layer above them and preserves the part people actually need to reason about: the work.
+- terminal summaries and tables from `wl rollup`, `wl classify`, `wl report`, `wl review-queue`, and `wl compare-costs`
+- report bundle files:
+  - `summary.json`
+  - `cost_by_work_category.csv`
+  - `classification_traces.parquet`
+  - `summary.md`
+  - `summary.html`
+- table exports to CSV, Parquet, or JSON via `wl export`
+- review queue items and reviewer overrides
+- benchmark reports in JSON or Markdown
+- JSON Schema and OpenAPI artifacts under `schemas/`
 
-- `ObservationSpan` is the normalized execution record
-- `WorkUnit` is the durable, human-readable unit of work
-- evidence and lineage stay attached to that work
-- review, policy, and economics are downstream interpretations on top of attributed work
+## Main Workflows
 
-## First-Class Public Datasets
+1. Initialize a local project with `wl init`.
+2. Ingest local trace payloads with `wl ingest`, or ingest supported public datasets with `wl ingest-hf`.
+3. Roll low-level observations into `WorkUnit`s with `wl rollup`.
+4. Optionally classify those work units with a YAML policy pack via `wl classify`.
+5. Generate reports, exports, review queues, overrides, and cost comparisons from the local store.
+6. Use `wl benchmark` to evaluate a policy pack against the included labeled suite.
 
-Supported now:
+## Repo Shape
 
-- [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces)
-  message / trajectory shape
-- [`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009)
-  trace / spans / totals shape
+This repository is primarily:
 
-Planned next:
+- a CLI tool (`wl`)
+- a local trace-processing pipeline (`WorkledgerPipeline`)
+- a schema/model package around `ObservationSpan`, `WorkUnit`, and `ClassificationTrace`
+- a reporting and review layer on top of a local DuckDB store
 
-- [`smolagents/codeagent-traces`](https://huggingface.co/datasets/smolagents/codeagent-traces)
-  documented as a future adapter target, not yet implemented
+It also includes:
+
+- a small FastAPI server
+- a benchmark harness for policy packs
+- synthetic demos and example integrations
+- tiny helper packages for emitting canonical observation events
 
 ## What `workledger` Is
 
-- an open trace-to-work attribution layer and work ledger
-- a bridge from public traces to `WorkUnit`
-- a local-first pipeline for normalization, rollup, review, reporting, and cost attribution
-- a small adapter seam for new trace ecosystems
+- a local trace-to-work pipeline
+- a way to normalize heterogeneous trace payloads into one schema
+- a rollup engine that groups observations into higher-level work units
+- a policy/reporting layer built on top of those rolled work units
 
 ## What `workledger` Is Not
 
-- an APM product
 - a tracing backend
-- a generic eval framework
-- a reasoning-trace viewer
-- enterprise compliance software with OSS paint on top
+- an APM product
+- a general-purpose evaluation framework
+- a hosted service in this repository
+- a claim that policy or economics are the primary primitive
 
-## Why Builders Care
+## Implemented vs Planned
 
-- many spans can become a few understandable `WorkUnit`s
-- ambiguity stays visible instead of getting flattened into fake certainty
-- evidence and lineage stay attached to each interpretation
-- review queues and policy outcomes stay grounded in the rolled work
-- public datasets become runnable demos instead of static artifacts
-- economics remain available, but as a downstream lens, not the thesis
+Implemented today:
 
-## CLI Surface
+- local project initialization, storage, and schema export
+- ingestion from local JSON/JSONL payloads
+- Hugging Face adapters for GAIA-style message traces and smoltrace-style span traces
+- rollup into `WorkUnit`
+- YAML policy classification, review queue ranking, and overrides
+- report generation, table export, comparative economics, benchmark evaluation, and a local API
+- synthetic demos for coding, marketing, support, and the older `capex` alias
+
+Planned or explicitly not live yet:
+
+- more public dataset adapters such as `smolagents/codeagent-traces`
+- package distribution on PyPI
+- stable interfaces; the repo is still marked alpha
+
+## Developer Surface
 
 ```bash
+wl init
 wl ingest traces.jsonl
-wl ingest-hf smolagents/gaia-traces --adapter gaia --split train --limit 3 --seed 7
+wl ingest-hf <dataset-id> --adapter auto --split train --limit 3 --seed 7
 wl rollup
 wl classify
 wl report
+wl report --include-economics
+wl review-queue
+wl compare-costs --from-project .workledger/coding
+wl benchmark benchmark-data/software_capex_review_v1 --format markdown
+wl demo coding
 wl demo hf-gaia
-wl demo hf-smoltrace
-wl compare-costs --from-project .workledger/hf-smoltrace
 ```
 
-`wl report` no longer includes economics by default. Add `--include-economics` when you want that downstream view.
-
-## Existing Downstream Paths
-
-Synthetic demos, policy packs, comparative economics, and software capex review are still in the repo.
-They are downstream examples of the same trace-to-work foundation, not the homepage story.
-
-The compatibility demo alias `wl demo open-traces` still works for the original synthetic coding path.
+`wl report` only includes comparative economics when you pass `--include-economics`.
 
 ## Development
 
@@ -147,4 +208,8 @@ make test
 make docs
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for adapter and fixture guidance.
+PyPI is not live for this release, so installation is source-first from this repository.
+
+![open traces before and after](docs/assets/open-traces-before-after.svg)
+
+[Getting Started](docs/getting-started.md) · [CLI Reference](docs/cli.md) · [How It Works](docs/how-it-works.md) · [Data Model](docs/data-model.md) · [Docs](https://couscous18.github.io/workledger/)

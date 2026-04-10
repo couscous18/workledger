@@ -1,36 +1,40 @@
 # Comparative Economics
 
-Comparative economics is a supported first-class view, but it is downstream of trace-to-work attribution.
+Comparative economics is implemented, but it is downstream of ingest and rollup.
 
-`workledger` first answers:
+The command surface is:
 
-- what work happened?
-- how much evidence supports that interpretation?
-- which items still need review?
-- what observed spend is attached to that work?
+```bash
+wl compare-costs --from-project .workledger/coding
+```
 
-Only after that does `wl compare-costs` estimate alternative deployment costs.
+The report surface is:
 
-## What It Builds On
+```bash
+wl report --include-economics
+```
 
-`wl compare-costs` is grounded in the attributed work ledger:
+## What It Uses
 
-- observed token usage from normalized observations
-- direct cost captured on source spans when available
-- direct, allocated, and total cost attached to rolled `WorkUnit`s
-- downstream classification context for interpreting where spend lands
+- observed `token_input` and `token_output` on stored `ObservationSpan`
+- observed direct cost on spans when present
+- rolled `WorkUnit` counts and cost totals
+- `ClassificationTrace` rows when available, to enrich per-category breakdowns
 
-## What It Measures
+Classification improves the breakdowns, but it is not required for the command to run.
 
-- observed token usage from normalized observations
-- direct cost when the source trace provides it
-- work-unit context for the rolled workload
+## Scenario Presets In Code
 
-## What It Estimates
+- `proprietary_api`
+- `open_hosted`
+- `self_hosted_gpu`
 
-- proprietary API assumptions
-- open-hosted assumptions
-- self-hosted GPU assumptions
+You can override the first scenario's rates from the CLI.
 
-These estimates are explicit, editable, and secondary to the core trace-to-work model.
-They are useful because the work has already been attributed.
+## What It Does Not Do
+
+- it does not measure quality or task success
+- it does not include latency, on-call, eval, or utilization waste unless modeled as overhead
+- it does not replace the observed cost already present in the trace data
+
+It is an estimate layer built on top of the ledger, not the core primitive itself.
