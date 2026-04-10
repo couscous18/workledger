@@ -2,6 +2,13 @@
 
 `workledger` is source-first for v0.1.0. The easiest way to understand the repo is to run a local end-to-end demo, then optionally try the supported public-trace adapters.
 
+In plain English: the goal is to turn raw AI trace data into a smaller set of work items a person can inspect, review, and report on.
+
+## Prerequisites
+
+- Python 3.11+
+- [`uv`](https://docs.astral.sh/uv/getting-started/installation/)
+
 ## Install
 
 ```bash

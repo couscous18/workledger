@@ -1,5 +1,10 @@
 # Installation
 
+## Prerequisites
+
+- Python 3.11+
+- [`uv`](https://docs.astral.sh/uv/getting-started/installation/)
+
 ```bash
 git clone https://github.com/couscous18/workledger.git
 cd workledger

@@ -2,6 +2,8 @@
 
 `workledger` is a Python CLI and local pipeline for turning AI trace inputs into normalized observations, rolled units of work, and optional downstream policy/reporting outputs.
 
+In plain English: it helps you turn messy agent traces into human-reviewable units of work so you can understand what happened, what it cost, and what may need review.
+
 ![open traces before and after](assets/open-traces-before-after.svg)
 
 The codebase is centered on three objects:
@@ -15,6 +17,7 @@ This repository is primarily a local DuckDB-backed pipeline exposed through the 
 Start with the network-free local demo:
 
 ```bash
+# prerequisites: Python 3.11+ and uv (https://docs.astral.sh/uv/getting-started/installation/)
 git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
