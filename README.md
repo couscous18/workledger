@@ -115,10 +115,10 @@ Already have OpenTelemetry JSON exports? Try this:
 
 ```bash
 uv run wl init --project-dir .workledger/my-traces
-uv run wl ingest .workledger/my-traces your-traces.json --format otel
-uv run wl rollup .workledger/my-traces
-uv run wl classify .workledger/my-traces
-uv run wl report .workledger/my-traces --format html --open
+uv run wl ingest your-traces.json --project-dir .workledger/my-traces
+uv run wl rollup --project-dir .workledger/my-traces
+uv run wl classify --project-dir .workledger/my-traces
+uv run wl report --project-dir .workledger/my-traces
 ```
 
 Supported formats: `otel`, `openinference`, `jsonl`, `cloudevents`, `sdk`

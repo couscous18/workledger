@@ -33,6 +33,18 @@ def _env_value(name: str) -> str | None:
     return os.getenv(name) or _dotenv_values().get(name)
 
 
+def _env_flag(name: str) -> bool | None:
+    value = _env_value(name)
+    if value is None:
+        return None
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(f"invalid boolean value for {name}: {value}")
+
+
 class WorkledgerConfig(BaseSettings):
     """Local project configuration for workledger."""
 
@@ -48,9 +60,10 @@ class WorkledgerConfig(BaseSettings):
     exports_dir: Path | None = Field(default=None)
     reports_dir: Path | None = Field(default=None)
     policies_dir: Path | None = Field(default=None)
-    host: str = Field(default="0.0.0.0")
+    host: str = Field(default="127.0.0.1")
     port: int = Field(default=8000)
     api_key: str | None = Field(default=None)
+    allow_unauthenticated_api: bool = Field(default=False)
     max_batch_size: int = Field(default=10_000, ge=1)
     max_payload_bytes: int = Field(default=2_000_000, ge=1)
     schema_version: str = Field(default="1.0.0")
@@ -61,12 +74,16 @@ class WorkledgerConfig(BaseSettings):
             self.project_dir = Path(project_dir)
         if self.database_path is None and (database_path := _env_value("WORKLEDGER_DATABASE_PATH")):
             self.database_path = Path(database_path)
-        if self.host == "0.0.0.0" and (host := _env_value("WORKLEDGER_HOST")):
+        if self.host == "127.0.0.1" and (host := _env_value("WORKLEDGER_HOST")):
             self.host = host
         if self.port == 8000 and (port := _env_value("WORKLEDGER_PORT")):
             self.port = int(port)
         if self.api_key is None and (api_key := _env_value("WORKLEDGER_API_KEY")):
             self.api_key = api_key
+        if self.allow_unauthenticated_api is False and (
+            allow_unauthenticated_api := _env_flag("WORKLEDGER_ALLOW_UNAUTHENTICATED_API")
+        ) is not None:
+            self.allow_unauthenticated_api = allow_unauthenticated_api
         if self.max_batch_size == 10_000 and (max_batch_size := _env_value("WORKLEDGER_MAX_BATCH_SIZE")):
             self.max_batch_size = int(max_batch_size)
         if self.max_payload_bytes == 2_000_000 and (max_payload_bytes := _env_value("WORKLEDGER_MAX_PAYLOAD_BYTES")):
