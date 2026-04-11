@@ -1,25 +1,72 @@
 # CLI Reference
 
-`wl` is the main operator surface.
+`wl` is the main public entrypoint for this repository.
+
+## Core Lifecycle
 
 ```bash
 wl init
 wl ingest traces.jsonl
+wl ingest-hf <dataset-id> --adapter auto --split train --limit 3 --seed 7
 wl rollup
 wl classify
 wl report
-wl demo agent-cost
-wl demo all
-wl compare-costs --from-project .workledger/agent-cost
+wl report --include-economics
 wl review-queue
-wl benchmark benchmark-data/software_capex_review_v1 --format markdown
+wl override <classification-id> --reviewer <name> --note <text>
+wl compare-costs --from-project .workledger/hf-smoltrace
 wl explain <id>
 wl export classification_traces parquet out/classification_traces.parquet
-wl doctor
+wl benchmark benchmark-data/software_capex_review_v1 --format markdown
 ```
 
-For the flagship path, start with `wl demo agent-cost --project-dir .workledger/agent-cost --open-report`.
+## Command Notes
 
-For the broader multi-team bundle, use `wl demo all --project-dir .workledger/demo --open-report`.
+- `wl init`: create a local project directory and copy built-in policy packs
+- `wl ingest`: load `.json` or `.jsonl` payloads and normalize them into `ObservationSpan`
+- `wl ingest-hf`: load a supported Hugging Face dataset through an implemented adapter
+- `wl rollup`: roll stored observations into `WorkUnit`
+- `wl classify`: apply a YAML policy pack; defaults to `management_reporting_v1.yaml`
+- `wl report`: write `summary.json`, `cost_by_work_category.csv`, `classification_traces.parquet`, `summary.md`, and `summary.html`
+- `wl review-queue`: show pending review items ranked by priority
+- `wl override`: apply a reviewer override to a stored classification
+- `wl compare-costs`: estimate alternative scenario costs from observed token usage and direct cost
+- `wl explain`: print the stored JSON for a work unit or classification
+- `wl export`: export a store table as CSV, Parquet, or JSON
+- `wl benchmark`: evaluate a policy pack against the included benchmark suite
+- `wl doctor`: check local module and project setup
 
-To compare observed spend with open-model assumptions, use `wl compare-costs --from-project .workledger/agent-cost` or point it at any project directory you generated reports for.
+## Demos
+
+Recommended local first run:
+
+```bash
+wl demo coding --project-dir .workledger/coding --open-report
+```
+
+Optional public-trace demos:
+
+```bash
+wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
+wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
+```
+
+The Hugging Face demos ingest, roll up, and report. They do not classify by default.
+
+Compatibility and broader demo paths:
+
+```bash
+wl demo open-traces  # compatibility alias for the original synthetic coding demo
+wl demo agent-cost   # older name for that same synthetic path
+wl demo capex
+wl demo marketing
+wl demo support
+wl demo all
+```
+
+## Policy Commands
+
+```bash
+wl policies list
+wl policies validate policies/management_reporting_v1.yaml
+```

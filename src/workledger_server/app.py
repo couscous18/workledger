@@ -84,8 +84,13 @@ def create_app(config: WorkledgerConfig | None = None) -> FastAPI:
         for index, payload in enumerate(payloads, start=1):
             try:
                 spans.append(normalize_event(payload))
-            except (TypeError, ValueError, KeyError) as exc:
-                errors.append({"line": index, "error": str(exc)})
+            except (TypeError, ValueError, KeyError):
+                logger.warning(
+                    "Failed to normalize event at line %d",
+                    index,
+                    exc_info=True,
+                )
+                errors.append({"line": index, "error": "invalid event payload"})
         if spans:
             pipeline(request).store.save_observation_spans(spans)
         logger.info("Ingested %d events via API (skipped %d)", len(spans), len(errors))
@@ -112,7 +117,11 @@ def create_app(config: WorkledgerConfig | None = None) -> FastAPI:
         policies_dir = pipeline(request).config.policies_dir
         assert policies_dir is not None
         try:
-            policy_path = resolve_policy_pack_path(policies_dir, policy) if policy else None
+            policy_path = (
+                resolve_policy_pack_path(policies_dir, policy).relative_to(policies_dir.resolve())
+                if policy
+                else None
+            )
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
         except FileNotFoundError as exc:

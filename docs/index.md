@@ -1,48 +1,44 @@
 # workledger
 
-`workledger` is an agent work ledger for AI systems.
+`workledger` is a Python CLI and local pipeline for turning AI trace inputs into normalized observations, rolled units of work, and optional downstream policy/reporting outputs.
 
-**Observability tells you what ran. `workledger` tells you what work happened.**
+In plain English: it helps you turn messy agent traces into human-reviewable units of work so you can understand what happened, what it cost, and what may need review.
 
-![workledger before and after](assets/workledger-before-after.svg)
+![open traces before and after](assets/open-traces-before-after.svg)
 
-`workledger` introduces `WorkUnit` as the missing layer between span-level telemetry and the decisions teams actually need to make. It compresses raw traces into accountable units of work with evidence, review states, and transparent economics.
+The codebase is centered on three objects:
 
-If you only try one thing, run:
+- `ObservationSpan`: normalized trace or span record
+- `WorkUnit`: rolled work item with evidence, lineage, cost, and review state
+- `ClassificationTrace`: optional policy-backed interpretation of a work unit
+
+This repository is primarily a local DuckDB-backed pipeline exposed through the `wl` CLI. It also ships a FastAPI server, built-in YAML policy packs, benchmark fixtures, schema artifacts, synthetic demos, and two Hugging Face dataset adapters.
+
+Start with the network-free local demo:
 
 ```bash
-git clone https://github.com/couscous18/workledger.git && cd workledger
+# prerequisites: Python 3.11+ and uv (https://docs.astral.sh/uv/getting-started/installation/)
+git clone https://github.com/couscous18/workledger.git
+cd workledger
 uv sync --all-extras
-uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-uv run wl compare-costs --from-project .workledger/agent-cost
+uv run wl demo coding --project-dir .workledger/coding --open-report
 ```
 
-PyPI is not published yet. The source-install path above is the only public install path we should advertise right now.
+Optional public-trace demos:
 
-![workledger demo screenshot](assets/workledger-demo-screenshot.png)
+```bash
+uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
+uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
+```
 
-Use it when you already have traces and want:
-
-- business-level work units instead of span soup
-- evidence-backed cost rollups
-- explainable work classifications and policy outcomes
-- review queues for ambiguous work instead of fake certainty
-- side-by-side economics estimates for proprietary, open-hosted, and self-hosted assumptions
-
-Principles:
-
-- compress noise into accountable work
-- preserve uncertainty instead of overstating certainty
-- keep evidence and lineage attached to interpretation
-- separate observed facts from modeled assumptions
-- stay open, inspectable, and local-first
+The Hugging Face demos exercise ingest, rollup, and reporting. Policy classification remains explicit.
 
 Start here:
 
-- [Proof Artifact](assets/builder-demo-report.html)
-- [Release Notes v0.1.0](releases/v0.1.0.md)
-- [Builder Demo](builder-demo.md)
 - [Getting Started](getting-started.md)
+- [CLI Reference](cli.md)
 - [How It Works](how-it-works.md)
-- [Comparative Economics](comparative-economics.md)
-- [Software CapEx Review](software-capex.md)
+- [Data Model](data-model.md)
+- [Adapters & Integrations](adapters.md)
+- [Reporting](reporting.md)
+- [Public Traces Demo](public-traces-demo.md)

@@ -1,6 +1,6 @@
 # Data Model
 
-Core objects:
+The implemented model layer revolves around these core objects:
 
 - `ObservationSpan`
 - `WorkUnit`
@@ -10,64 +10,63 @@ Core objects:
 - `PolicyPack`
 - `ReportArtifact`
 
-`WorkUnit` is the key public abstraction. It bridges raw telemetry to review, policy, reporting, and economics.
-
 ## ObservationSpan
 
-`ObservationSpan` is the normalized event record.
+`ObservationSpan` is the normalized ingestion record. Every supported input path maps into this object before anything else happens.
 
 Key fields:
 
-- `source_kind`, `trace_id`, `span_id`, `parent_span_id`
+- `source_kind`
+- `trace_id`, `span_id`, `parent_span_id`
 - `span_kind`, `name`, `start_time`, `end_time`
-- `model_name`, `provider`, `tool_name`
 - `token_input`, `token_output`, `direct_cost`
-- `attributes` for source metadata
-- `facets` for namespaced extension data
-
-`token_input` and `token_output` are the main usage counters used for downstream cost analysis and comparative economics.
+- `token_taxes` for optional token-tax metadata
+- `attributes` for mapped source fields
+- `facets` for namespaced metadata such as `hf`, `smoltrace`, `git`, `marketing`, or `support`
+- `raw_payload_ref` for source lineage such as `hf://dataset/split/row#message-2`
+- `work_unit_key` for sources that already expose a useful rollup boundary
 
 ## WorkUnit
 
-`WorkUnit` is the rollup layer and the missing primitive in the system. It groups multiple spans into a unit of work that a human can reason about, review, and attach policy to.
+`WorkUnit` is the main primitive in this repository. It groups one or more observations into a unit a person can inspect, review, and reason about.
 
 Key fields:
 
 - `title`, `summary`, `objective`
-- `actor`, `actor_kind`, `project`, `team`
+- `actor`, `actor_kind`, `project`, `team`, `cost_center`
 - `review_state`, `trust_state`
 - `direct_cost`, `allocated_cost`, `total_cost`
 - `source_span_ids`, `compression_ratio`
 - `evidence_bundle`, `lineage_refs`
+- `labels`, `facets`, `source_systems`
+
+This is where raw execution detail becomes accountable work.
 
 ## ClassificationTrace
 
-`ClassificationTrace` records policy-backed interpretation of one work unit.
+`ClassificationTrace` is a downstream interpretation of one `WorkUnit`. It exists only after `wl classify` runs.
 
 Key fields:
 
-- `work_category`
-- `policy_outcome`
-- `confidence_score`
-- `explanation`
-- `reviewer_required`
-- `decisions`
+- `policy_basis`, `work_category`, `policy_outcome`
+- `cost_category`, `direct_cost`, `indirect_cost`, `blended_cost`
+- `confidence_score`, `evidence_score`, `evidence_strength`
+- `reviewer_required`, `reviewer_status`, `override_status`
+- `decisions` for explainable policy outcomes
 
-## Relationships
+## Supporting Objects
+
+- `PolicyDecision`: one rule match or default policy decision
+- `EvidenceRef`: evidence stored inside a `WorkUnit`
+- `PolicyPack`: YAML-loaded ruleset for `wl classify`
+- `PolicyRun`: summary row for one classification run
+- `ReportArtifact`: persisted reference to a generated report file
+
+## Relationship
 
 ```mermaid
 flowchart LR
   A["ObservationSpan"] --> B["WorkUnit"]
-  B --> C["ClassificationTrace"]
-  C --> D["PolicyDecision"]
+  B --> C["Optional ClassificationTrace"]
+  C --> D["Review queue / reports / exports / economics"]
 ```
-
-## Extension Facets
-
-Extension facets should use namespaced keys such as:
-
-- `git.*`
-- `marketing.*`
-- `support.*`
-- `finance.*`
-- `vendor.*`

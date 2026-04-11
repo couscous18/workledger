@@ -1,25 +1,25 @@
 # FAQ
 
-## Is this only for accounting or software capex?
+## Is this an accounting tool?
 
-No. The core product is trace compression plus work intelligence. Software capex review is one bundled use case, not the homepage story.
+No. The core contribution is trace-to-work attribution. Software capex review stays in the repo as a downstream example.
 
 ## What does it do that a trace viewer does not?
 
-It introduces `WorkUnit` as a ledger layer above raw traces. It rolls spans into units of work, adds cost and trust context, preserves review-worthy ambiguity, and compares deployment-economics scenarios on top of the same normalized data.
+It turns raw traces into `WorkUnit`s with evidence, lineage, review-needed states, and work-attached cost. A trace viewer shows execution detail; `workledger` makes the work legible.
 
-## Why lead with agent work ledger?
+## Does it attach cost to work or only to raw spans?
 
-Because that is the most legible proof of the primitive. Once work is ledgered, the same foundation can support reporting, governance, policy packs, and software capex review.
+It attaches cost to work. `ObservationSpan` preserves source-level direct cost, and `WorkUnit` carries direct, allocated, and total cost so teams can reason about spend at the work level.
 
-## Can it compare proprietary APIs with open or self-hosted models?
+## Why lead with Hugging Face public datasets?
 
-Yes, as an estimator. WorkLedger measures observed token usage and direct cost, then compares that workload against transparent open-hosted or self-hosted assumptions that you can edit.
+Because public traces are now a practical way to show the trace-to-work primitive in the open-agent ecosystem.
 
-## Does this automate accounting decisions?
+## Is economics still supported?
 
-No. It produces candidate interpretations with evidence, explanations, confidence, and review states.
+Yes. It is available through reports and `wl compare-costs`, and it stays grounded in the attributed work ledger. It is downstream of the core trace-to-work layer, but it is still a real supported capability.
 
-## Why DuckDB?
+## Does it collect traces?
 
-Because V1 is local-first and analytical. DuckDB gives simple inspectability, SQL, and Parquet export in one small dependency.
+No. It consumes traces. `workledger` is not a tracing backend.
