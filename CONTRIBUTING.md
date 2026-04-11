@@ -2,7 +2,11 @@
 
 Thank you for your interest in contributing to workledger. Every contribution matters, whether it's code, documentation, bug reports, or feature ideas.
 
-workledger is intentionally community-open and expansion-friendly. Policy packs, benchmarks, demos, documentation, and integrations are all fair game for contribution. Please assume review is best effort rather than on a guaranteed support schedule.
+The repository is currently centered on a local pipeline:
+
+`ingest -> ObservationSpan -> WorkUnit -> optional ClassificationTrace -> reports / review / exports`
+
+Policy packs, benchmarks, demos, documentation, input adapters, and report improvements are all fair game for contribution. Please assume review is best effort rather than on a guaranteed support schedule.
 
 Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
@@ -30,10 +34,10 @@ pre-commit install
 make ci
 ```
 
-### Run the demo
+### Run a full local demo
 
 ```bash
-uv run wl demo all --project-dir .workledger/demo --open-report
+uv run wl demo coding --project-dir .workledger/coding --open-report
 ```
 
 ## Development Loop
@@ -51,9 +55,8 @@ make ci        # lint + test (same as CI)
 
 - Issues labeled [`good first issue`](https://github.com/couscous18/workledger/labels/good%20first%20issue) are a great starting point
 - Issues labeled [`help wanted`](https://github.com/couscous18/workledger/labels/help%20wanted) are more involved but well-defined
-- Check the [Roadmap](README.md#roadmap) for larger initiatives
 - Documentation improvements are always welcome
-- Benchmarks, example demos, policy packs, and integrations are intentionally small starter surfaces and welcome expansion
+- Benchmarks, example demos, policy packs, report summaries, and integrations are intentionally small starter surfaces and welcome expansion
 
 ## Contribution Guidelines
 
@@ -61,7 +64,37 @@ make ci        # lint + test (same as CI)
 - **Prefer extension facets over bloating core models.** The facet system exists for domain-specific metadata.
 - **Preserve explainability.** Rollup and policy changes must produce traceable, auditable decisions.
 - **Add or update fixtures** for every behavior change in rollup or classification.
-- **Treat accounting outputs as candidate interpretations, never certainty.** This is a design principle, not a suggestion.
+- **Preserve lineage.** Public trace adapters must keep stable source refs in `raw_payload_ref`.
+- **Keep the repo story truthful.** Docs should describe the implemented CLI and pipeline, not an assumed product narrative.
+
+## Adding A Public Trace Adapter
+
+Keep adapters small and explicit.
+
+Minimum expectations:
+
+- map source rows into `ObservationSpan`
+- preserve source lineage in `raw_payload_ref`
+- use namespaced `facets` for adapter-specific metadata
+- keep review-needed ambiguity visible instead of flattening it away
+- add fixture-driven tests
+- add a demo-sized path that can run on a small public sample
+
+Recommended mapping:
+
+- stable dataset metadata in `facets["hf"]` or another source namespace
+- source row or message/span IDs in `raw_payload_ref`
+- `work_unit_key` when a source row should become a single rolled work candidate
+- `attributes["review_required"]` when the trace shape is ambiguous
+
+## Other Real Extension Points
+
+- input normalization in `src/workledger/ingest/normalize.py`
+- rollup heuristics in `src/workledger/rollup/`
+- YAML policy packs under `policies/`
+- reporting summaries in `src/workledger/reporting/engine.py`
+- benchmark cases under `benchmark-data/`
+- canonical emitters in `src/workledger_observe/` and `packages/sdk/`
 
 ## Pull Requests
 

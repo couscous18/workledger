@@ -84,8 +84,13 @@ def create_app(config: WorkledgerConfig | None = None) -> FastAPI:
         for index, payload in enumerate(payloads, start=1):
             try:
                 spans.append(normalize_event(payload))
-            except (TypeError, ValueError, KeyError) as exc:
-                errors.append({"line": index, "error": str(exc)})
+            except (TypeError, ValueError, KeyError):
+                logger.warning(
+                    "Failed to normalize event at line %d",
+                    index,
+                    exc_info=True,
+                )
+                errors.append({"line": index, "error": "invalid event payload"})
         if spans:
             pipeline(request).store.save_observation_spans(spans)
         logger.info("Ingested %d events via API (skipped %d)", len(spans), len(errors))

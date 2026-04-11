@@ -5,113 +5,114 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://couscous18.github.io/workledger/)
 
-`workledger` is an agent work ledger for AI systems.
+`workledger` is a Python CLI and local pipeline for turning AI trace data into normalized observations, rolled units of work, and optional policy, review, report, and cost-analysis outputs.
 
-**Observability tells you what ran. `workledger` tells you what work happened.**
+In plain English: it helps you turn messy agent traces into human-reviewable units of work so you can see what happened, what it cost, and what may need review.
 
-AI traces are great at capturing execution, but teams still need a way to answer higher-level questions:
+The core implemented flow today is:
 
-- What did the agent actually accomplish?
-- Which work was expensive, low-trust, or review-worthy?
-- Where should we attach policy, accountability, or economics?
+- `ObservationSpan`: normalized trace/message/span record
+- `WorkUnit`: rolled-up unit of work with evidence, lineage, review state, and cost
+- `ClassificationTrace`: optional policy-backed interpretation of a `WorkUnit`
 
-`workledger` introduces `WorkUnit` as the missing layer between span-level telemetry and business or governance decisions. Feed in OpenTelemetry, OpenInference, JSONL, or SDK events. Get back reviewable units of work with cost, evidence, policy context, and transparent economics.
-
-## Who This Is For
-
-- Teams running AI agents that produce execution traces (OpenTelemetry, OpenInference, JSONL)
-- Engineers who need to answer "what work happened?" not just "what code ran?"
-- Finance and governance teams that need policy-backed classification of AI work
-
-## Who This Is Not For
-
-- Generic application analytics or APM replacement
-- A tracing backend — workledger consumes traces, it doesn't collect them
-- Production-ready systems (this is alpha, expect breaking changes)
-
-```bash
-git clone https://github.com/couscous18/workledger.git && cd workledger
-uv sync --all-extras
-uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-uv run wl compare-costs --from-project .workledger/agent-cost
-```
-
-![workledger demo screenshot](docs/assets/workledger-demo-screenshot.png)
-
-[See Proof Artifact](docs/assets/builder-demo-report.html) · [Builder Demo](docs/builder-demo.md) · [Getting Started](docs/getting-started.md) · [Docs](https://couscous18.github.io/workledger/)
-
-## The Missing Primitive
-
-Observability systems tell you about spans, tokens, models, and tools. They do not give you a durable ledger of work that a human can inspect, review, and reason about.
-
-`WorkUnit` is that ledger layer.
+The repository is source-first and alpha. It primarily ships a local DuckDB-backed pipeline, plus a FastAPI server, JSON Schema/OpenAPI artifacts, small observation emitters, synthetic demos, and two Hugging Face dataset adapters.
 
 ```text
-raw spans
-  -> normalized observations
-  -> rolled-up work units
-  -> classification traces
-  -> review, reporting, and economics
+JSON / JSONL / OpenInference / OTEL / CloudEvents / SDK events / supported HF datasets
+  -> ObservationSpan
+  -> WorkUnit
+  -> optional ClassificationTrace
+  -> reports / review queue / exports / comparative economics
 ```
 
-That lets builders move from "what executed?" to questions like:
+## What This Repo Contains
 
-- What did this agent run add up to?
-- Which outputs were expensive but still low-trust?
-- Which items need human review instead of fake certainty?
-- How would this workload look under open-hosted or self-hosted assumptions?
+- `src/workledger/`: the main pipeline, models, ingestion, rollup, policy, reporting, storage, review, and economics code
+- `src/workledger_server/`: a FastAPI wrapper around the same local pipeline
+- `src/workledger_observe/` and `packages/sdk/`: helpers for emitting canonical observation events
+- `policies/`: built-in YAML policy packs
+- `benchmark-data/`: a labeled benchmark suite for the software capex policy pack
+- `examples/`: tiny and framework-oriented examples
+- `schemas/`: generated JSON Schema and OpenAPI artifacts
 
-## Why Builders Care
+## Core Primitive
 
-- Many spans become a few understandable `WorkUnit`s
-- Cost is attached to work, not just raw requests
-- Ambiguity stays visible through a review queue
-- Evidence and lineage stay attached to every interpretation
-- Economics remain transparent and assumption-driven, not benchmark theater
+`WorkUnit` is the main object this repository introduces.
 
-## Principles
+`ObservationSpan` is the ingestion boundary. It preserves source trace identity, timestamps, token counts, direct cost, lineage, and source-specific metadata.
 
-- Compress noise into accountable work
-- Preserve uncertainty instead of overstating certainty
-- Keep evidence and lineage attached to every interpretation
-- Separate observed facts from modeled assumptions
-- Stay open, inspectable, and local-first by default
+`WorkUnit` is the rollup boundary. It groups related observations into something a human can inspect: title, summary, objective, evidence bundle, lineage refs, source span IDs, review/trust state, and rolled cost.
 
-## 60-Second Quickstart
+`ClassificationTrace` is downstream of that. It attaches rule-based policy outcomes, confidence, evidence strength, and review requirements to an already-rolled `WorkUnit`.
 
-### Install from source
+## Recommended First Run
+
+The best no-network end-to-end path in the repo is the local coding demo:
 
 ```bash
+# prerequisites: Python 3.11+ and uv (https://docs.astral.sh/uv/getting-started/installation/)
 git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
-uv run wl init --project-dir .workledger
-uv run wl demo agent-cost --project-dir .workledger/agent-cost --open-report
-uv run wl compare-costs --from-project .workledger/agent-cost
+
+uv run wl demo coding --project-dir .workledger/coding --open-report
 ```
 
-> PyPI publishing is coming. For now, install from source.
+That command:
 
-### What You Should See
+- writes synthetic SDK-style observation events into `.workledger/coding/raw/`
+- ingests them into a local DuckDB project
+- rolls them into `WorkUnit`s
+- classifies them with the built-in management reporting policy pack
+- writes terminal, JSON, CSV, Parquet, Markdown, and HTML report outputs
+- prints the generated HTML report path when `--open-report` is set
 
-- many raw spans compressed into a smaller set of `WorkUnit`s
-- expensive or low-trust work surfaced in a way humans can inspect
-- a pending review queue instead of fake certainty
-- an economics comparison that separates observed usage from modeled assumptions
-- an HTML report at `.workledger/agent-cost/reports/summary.html`
-
-### Broader Demo Bundle
-
-If you want the multi-team demo set after the flagship agent path:
+If you want the smallest Python example instead of the full CLI flow:
 
 ```bash
-uv run wl demo all --project-dir .workledger/demo --open-report
-uv run wl compare-costs --from-project .workledger/demo
+uv run python examples/tiny_pipeline.py
 ```
 
-### Bring Your Own Traces (3 Minutes)
+## Optional Public Trace Demos
 
-Already have OpenTelemetry JSON exports? Try this:
+The repo also includes optional Hugging Face ingestion for two implemented dataset shapes:
+
+```bash
+uv run wl ingest-hf smolagents/gaia-traces --adapter gaia --split train --limit 3 --seed 7 --project-dir .workledger/hf-gaia
+uv run wl rollup --project-dir .workledger/hf-gaia
+uv run wl report --project-dir .workledger/hf-gaia
+
+uv run wl ingest-hf kshitijthakkar/smoltrace-traces-20260130_053009 --adapter smoltrace --split train --limit 3 --seed 7 --project-dir .workledger/hf-smoltrace
+uv run wl rollup --project-dir .workledger/hf-smoltrace
+uv run wl report --project-dir .workledger/hf-smoltrace
+```
+
+Or via demos:
+
+```bash
+uv run wl demo hf-gaia --project-dir .workledger/hf-gaia --open-report
+uv run wl demo hf-smoltrace --project-dir .workledger/hf-smoltrace --open-report
+```
+
+Important: the Hugging Face demos ingest, roll up, and report by default. They do **not** automatically run policy classification unless you explicitly run `wl classify` afterward or pass a policy into the underlying demo helper.
+
+## Inputs Supported Today
+
+`wl ingest` supports `.json` and `.jsonl` files containing:
+
+- canonical SDK-shaped observation events
+- OpenInference-like payloads with `trace_id` / `span_id`
+- OTEL-style JSON spans with `traceId` / `spanId`
+- CloudEvents whose `data` contains either canonical SDK payloads or OpenInference-like payloads
+
+`wl ingest-hf` supports only these implemented adapters:
+
+- `gaia` for message-style rows such as [`smolagents/gaia-traces`](https://huggingface.co/datasets/smolagents/gaia-traces)
+- `smoltrace` for trace-and-span rows such as [`kshitijthakkar/smoltrace-traces-20260130_053009`](https://huggingface.co/datasets/kshitijthakkar/smoltrace-traces-20260130_053009)
+
+The REST API exposes the same ingestion boundary through `/ingest/events` and `/ingest/spans`.
+
+## Outputs Produced Today
 
 ```bash
 uv run wl init --project-dir .workledger/my-traces
@@ -121,61 +122,93 @@ uv run wl classify --project-dir .workledger/my-traces
 uv run wl report --project-dir .workledger/my-traces
 ```
 
-Supported formats: `otel`, `openinference`, `jsonl`, `cloudevents`, `sdk`
+## Main Workflows
 
-### Tiny Python Example
+1. Initialize a local project with `wl init`.
+2. Ingest local trace payloads with `wl ingest`, or ingest supported public datasets with `wl ingest-hf`.
+3. Roll low-level observations into `WorkUnit`s with `wl rollup`.
+4. Optionally classify those work units with a YAML policy pack via `wl classify`.
+5. Generate reports, exports, review queues, overrides, and cost comparisons from the local store.
+6. Use `wl benchmark` to evaluate a policy pack against the included labeled suite.
+
+## Repo Shape
+
+This repository is primarily:
+
+- a CLI tool (`wl`)
+- a local trace-processing pipeline (`WorkledgerPipeline`)
+- a schema/model package around `ObservationSpan`, `WorkUnit`, and `ClassificationTrace`
+- a reporting and review layer on top of a local DuckDB store
+
+It also includes:
+
+- a small FastAPI server
+- a benchmark harness for policy packs
+- synthetic demos and example integrations
+- tiny helper packages for emitting canonical observation events
+
+## What `workledger` Is
+
+- a local trace-to-work pipeline
+- a way to normalize heterogeneous trace payloads into one schema
+- a rollup engine that groups observations into higher-level work units
+- a policy/reporting layer built on top of those rolled work units
+
+## What `workledger` Is Not
+
+- a tracing backend
+- an APM product
+- a general-purpose evaluation framework
+- a hosted service in this repository
+- a claim that policy or economics are the primary primitive
+
+## Implemented vs Planned
+
+Implemented today:
+
+- local project initialization, storage, and schema export
+- ingestion from local JSON/JSONL payloads
+- Hugging Face adapters for GAIA-style message traces and smoltrace-style span traces
+- rollup into `WorkUnit`
+- YAML policy classification, review queue ranking, and overrides
+- report generation, table export, comparative economics, benchmark evaluation, and a local API
+- synthetic demos for coding, marketing, support, and the older `capex` alias
+
+Planned or explicitly not live yet:
+
+- more public dataset adapters such as `smolagents/codeagent-traces`
+- package distribution on PyPI
+- stable interfaces; the repo is still marked alpha
+
+## Developer Surface
 
 ```bash
-uv run python examples/tiny_pipeline.py
+wl init
+wl ingest traces.jsonl
+wl ingest-hf <dataset-id> --adapter auto --split train --limit 3 --seed 7
+wl rollup
+wl classify
+wl report
+wl report --include-economics
+wl review-queue
+wl compare-costs --from-project .workledger/coding
+wl benchmark benchmark-data/software_capex_review_v1 --format markdown
+wl demo coding
+wl demo hf-gaia
 ```
 
-## Why This Is a New Layer
+`wl report` only includes comparative economics when you pass `--include-economics`.
 
-- It rolls many spans into a unit you can actually reason about: `WorkUnit`
-- It adds explainable, policy-backed interpretation on top of raw traces
-- It preserves ambiguity with a review queue when confidence is not high enough
-- It compares deployment options with explicit assumptions instead of hiding the math
+## Development
 
-## What Becomes Possible Once Work Is Ledgered
-
-- agent cost analysis and review burden tracking
-- management reporting on AI work by team or function
-- software capex review and other policy-backed downstream interpretations
-- exports and local analytics that stay grounded in canonical trace data
-
-## Comparative Economics
-
-`wl compare-costs` uses observed token totals from ingested work and compares them against editable scenario presets:
-
-- `proprietary_api`
-- `open_hosted`
-- `self_hosted_gpu`
-
-These scenarios are not benchmark claims. They are transparent, configurable assumptions layered on top of the canonical trace and work-unit data.
-
-## V1 Includes
-
-- Canonical models for `ObservationSpan`, `WorkUnit`, `ClassificationTrace`, `PolicyDecision`, `EvidenceRef`, `PolicyPack`, and `ReportArtifact`
-- Ingestion for JSONL, OpenInference-like payloads, OTEL-like JSON, CloudEvents JSON, and direct SDK-shaped events
-- Rollup engine that compresses low-level spans into human-reviewable work units
-- Declarative policy pack engine with explainable rule matches and review-required states
-- DuckDB-backed local analytical store with export support
-- CLI (`wl`) for init, ingest, rollup, classify, report, export, explain, demo, compare-costs, doctor, and policy validation
-- Local FastAPI server with OpenAPI docs and optional API-key auth
-- Runnable agent, marketing, and support demos, plus a software capex publication bundle as a downstream example
-- JSON Schema export and published OpenAPI artifacts
-- CSV, JSON, Parquet, Markdown, and HTML report outputs
-
-## Architecture
-
-```mermaid
-flowchart LR
-  A["OpenTelemetry / OpenInference / JSONL / CloudEvents / SDK"] --> B["Normalization<br/>ObservationSpan"]
-  B --> C["Rollup Engine<br/>WorkUnit"]
-  C --> D["Policy Engine<br/>ClassificationTrace + PolicyDecision"]
-  D --> E["DuckDB + Parquet"]
-  E --> F["CLI / API / Reports / Exports"]
-  E --> G["Comparative Economics"]
-  C --> H["Evidence Bundle + Lineage"]
-  D --> I["Review Queue + Overrides"]
+```bash
+make lint
+make test
+make docs
 ```
+
+PyPI is not live for this release, so installation is source-first from this repository.
+
+![open traces before and after](docs/assets/open-traces-before-after.svg)
+
+[Getting Started](docs/getting-started.md) · [CLI Reference](docs/cli.md) · [How It Works](docs/how-it-works.md) · [Data Model](docs/data-model.md) · [Docs](https://couscous18.github.io/workledger/)

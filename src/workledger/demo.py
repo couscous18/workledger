@@ -1,4 +1,4 @@
-"""Synthetic trace generators for coding, marketing, and support scenarios."""
+"""Public Hugging Face demo runners plus synthetic trace generators."""
 
 from __future__ import annotations
 
@@ -10,6 +10,25 @@ from typing import Any
 from workledger import WorkledgerConfig, WorkledgerPipeline
 from workledger.models import SpanKind
 from workledger.utils.ids import new_id
+
+HF_DEMOS: dict[str, dict[str, Any]] = {
+    "hf-gaia": {
+        "dataset_id": "smolagents/gaia-traces",
+        "adapter": "gaia",
+        "split": "train",
+        "limit": 3,
+        "seed": 7,
+        "include_economics": False,
+    },
+    "hf-smoltrace": {
+        "dataset_id": "kshitijthakkar/smoltrace-traces-20260130_053009",
+        "adapter": "smoltrace",
+        "split": "train",
+        "limit": 3,
+        "seed": 7,
+        "include_economics": False,
+    },
+}
 
 
 def _event(
@@ -434,6 +453,7 @@ def support_demo_events() -> list[dict[str, Any]]:
 def demo_events(name: str) -> list[dict[str, Any]]:
     mapping = {
         "capex": coding_demo_events,
+        "open-traces": coding_demo_events,
         "agent-cost": coding_demo_events,
         "coding": coding_demo_events,
         "marketing": marketing_demo_events,
@@ -455,22 +475,22 @@ def write_demo_file(name: str, destination: Path) -> Path:
 
 
 def run_demo(name: str, project_dir: Path, policy_path: Path | None = None) -> dict[str, Any]:
+    if name in HF_DEMOS:
+        return run_hf_demo(name, project_dir, policy_path=policy_path)
     config = WorkledgerConfig.from_project_dir(project_dir)
     pipeline = WorkledgerPipeline(config)
     raw_events_dir = config.raw_events_dir
-    policies_dir = config.policies_dir
     assert raw_events_dir is not None
-    assert policies_dir is not None
     input_path = write_demo_file(name, raw_events_dir / f"{name}.jsonl")
     ingest_result = pipeline.ingest(input_path)
     work_units = pipeline.rollup()
     policy_path = (
-        policies_dir / "software_capex_review_v1.yaml"
+        Path("software_capex_review_v1.yaml")
         if name == "capex" and policy_path is None
         else policy_path
     )
     classifications = pipeline.classify(policy_path)
-    include_economics = name in {"all", "agent-cost", "coding"}
+    include_economics = name in {"all", "open-traces", "agent-cost", "coding"}
     reports = pipeline.report(include_economics=include_economics)
     summary = pipeline.report_engine.summary(include_economics=include_economics)
     review_queue = pipeline.review_queue()
@@ -478,6 +498,37 @@ def run_demo(name: str, project_dir: Path, policy_path: Path | None = None) -> d
     return {
         "input_path": str(input_path),
         "ingest": ingest_result.model_dump(mode="json"),
+        "work_units": [item.model_dump(mode="json") for item in work_units],
+        "classifications": [item.model_dump(mode="json") for item in classifications],
+        "reports": [item.model_dump(mode="json") for item in reports],
+        "summary": summary,
+        "review_queue": review_queue,
+    }
+
+
+def run_hf_demo(name: str, project_dir: Path, policy_path: Path | None = None) -> dict[str, Any]:
+    config = WorkledgerConfig.from_project_dir(project_dir)
+    pipeline = WorkledgerPipeline(config)
+    demo = HF_DEMOS[name]
+    ingest_result = pipeline.ingest_huggingface(
+        demo["dataset_id"],
+        adapter_name=demo["adapter"],
+        split=demo["split"],
+        limit=demo["limit"],
+        seed=demo["seed"],
+    )
+    work_units = pipeline.rollup()
+    classifications = pipeline.classify(policy_path) if policy_path is not None else []
+    reports = pipeline.report(include_economics=bool(demo["include_economics"]))
+    summary = pipeline.report_engine.summary(include_economics=bool(demo["include_economics"]))
+    review_queue = pipeline.review_queue()
+    pipeline.close()
+    return {
+        "dataset_id": ingest_result.dataset_id,
+        "adapter_name": ingest_result.adapter_name,
+        "split": ingest_result.split,
+        "input_path": str(ingest_result.raw_path),
+        "ingest": ingest_result.ingest.model_dump(mode="json"),
         "work_units": [item.model_dump(mode="json") for item in work_units],
         "classifications": [item.model_dump(mode="json") for item in classifications],
         "reports": [item.model_dump(mode="json") for item in reports],
