@@ -1,14 +1,5 @@
 SCHEMA_SQL = [
     """
-    create table if not exists raw_events (
-      event_id varchar primary key,
-      source_kind varchar not null,
-      event_type varchar not null,
-      occurred_at timestamp not null,
-      payload_json json not null
-    )
-    """,
-    """
     create table if not exists observation_spans (
       observation_id varchar primary key,
       trace_id varchar not null,

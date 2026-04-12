@@ -312,7 +312,7 @@
         "operationId": "run_classify_classify_post",
         "parameters": [
           {
-            "name": "policy_path",
+            "name": "policy",
             "in": "query",
             "required": false,
             "schema": {
@@ -324,7 +324,7 @@
                   "type": "null"
                 }
               ],
-              "title": "Policy Path"
+              "title": "Policy"
             }
           },
           {

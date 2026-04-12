@@ -4,7 +4,7 @@ import json
 import logging
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, TypeVar, cast
+from typing import Any, TypeVar
 
 from workledger.models import (
     ClassificationTrace,
@@ -16,7 +16,6 @@ from workledger.models import (
     ReviewOverride,
     WorkUnit,
 )
-from workledger.schema import write_schema_bundle
 from workledger.storage.schema import SCHEMA_SQL
 
 logger = logging.getLogger(__name__)
@@ -57,7 +56,6 @@ class DuckDBStore:
         self.connection.close()
 
     _KNOWN_TABLES = frozenset({
-        "raw_events",
         "observation_spans",
         "work_units",
         "classification_traces",
@@ -103,23 +101,6 @@ class DuckDBStore:
         self.connection.executemany(
             f"insert or replace into {table} ({', '.join(columns)}) values ({placeholders})",
             row_list,
-        )
-
-    def record_raw_event(
-        self, event_id: str, source_kind: str, event_type: str, payload: dict[str, Any]
-    ) -> None:
-        self._replace_many(
-            "raw_events",
-            ["event_id", "source_kind", "event_type", "occurred_at", "payload_json"],
-            [
-                (
-                    event_id,
-                    source_kind,
-                    event_type,
-                    payload.get("occurred_at") or payload.get("timestamp"),
-                    json.dumps(payload),
-                )
-            ],
         )
 
     def save_observation_spans(self, spans: list[ObservationSpan]) -> None:
@@ -752,15 +733,3 @@ class DuckDBStore:
         else:
             raise ValueError(f"unsupported export format: {fmt}")
         return destination
-
-    def scalar(self, sql: str) -> Any:
-        row = self.connection.execute(sql).fetchone()
-        if row is None:
-            return None
-        return row[0]
-
-    def fetch_rows(self, sql: str) -> list[tuple[Any, ...]]:
-        return cast(list[tuple[Any, ...]], self.connection.execute(sql).fetchall())
-
-    def export_json_schema(self, models: dict[str, type[Any]], destination: Path) -> None:
-        write_schema_bundle(destination, models)

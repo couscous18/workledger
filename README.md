@@ -29,7 +29,7 @@ JSON / JSONL / OpenInference / OTEL / CloudEvents / SDK events / supported HF da
 
 - `src/workledger/`: the main pipeline, models, ingestion, rollup, policy, reporting, storage, review, and economics code
 - `src/workledger_server/`: a FastAPI wrapper around the same local pipeline
-- `src/workledger_observe/` and `packages/sdk/`: helpers for emitting canonical observation events
+- `src/workledger_observe/`: helpers for emitting canonical observation events
 - `policies/`: built-in YAML policy packs
 - `benchmark-data/`: a labeled benchmark suite for the software capex policy pack
 - `examples/`: tiny and framework-oriented examples
@@ -68,10 +68,28 @@ That command:
 - prints the generated HTML report path when `--open-report` is set
 
 If you want the smallest Python example instead of the full CLI flow:
-
 ```bash
 uv run python examples/tiny_pipeline.py
 ```
+
+For a broader local demo bundle after the coding path:
+
+```bash
+uv run wl demo all --project-dir .workledger/demo --open-report
+uv run wl compare-costs --from-project .workledger/demo
+```
+
+To bring your own traces:
+
+```bash
+uv run wl init --project-dir .workledger/my-traces
+uv run wl ingest your-traces.json --project-dir .workledger/my-traces
+uv run wl rollup --project-dir .workledger/my-traces
+uv run wl classify --project-dir .workledger/my-traces
+uv run wl report --project-dir .workledger/my-traces
+```
+
+Supported formats: `otel`, `openinference`, `jsonl`, `cloudevents`, `sdk`
 
 ## Optional Public Trace Demos
 
