@@ -74,6 +74,20 @@ workledger-server = "workledger_server.app:run"
 [tool.hatch.build.targets.wheel]
 packages = ["src/workledger", "src/workledger_observe", "src/workledger_server"]
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.devcontainer",
+  "/.dockerignore",
+  "/.github",
+  "/.gitpod.yml",
+  "/.pre-commit-config.yaml",
+  "/.uv-cache",
+  "/build",
+  "/dist",
+  "/docs/assets/*.html",
+  "/site",
+]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
