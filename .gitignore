@@ -3,6 +3,7 @@
 .coverage
 .env
 .env.*
+!.env.example
 .hypothesis/
 .idea/
 .mypy_cache/

@@ -1,13 +1,15 @@
+Raw AI traces tell you what ran, but they do not tell you what work happened, what needs review, or what a human should inspect next.
+
+`workledger` turns noisy spans into reviewable work units with evidence, lineage, cost, and explicit review state.
+
+It helps you go from run log to work log without hand-auditing a trace dump.
+
 # workledger
 
 [![CI](https://github.com/couscous18/workledger/actions/workflows/ci.yml/badge.svg)](https://github.com/couscous18/workledger/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://couscous18.github.io/workledger/)
-
-`workledger` is a Python CLI and local pipeline for turning AI trace data into normalized observations, rolled units of work, and optional policy, review, report, and cost-analysis outputs.
-
-In plain English: it helps you turn messy agent traces into human-reviewable units of work so you can see what happened, what it cost, and what may need review.
 
 The core implemented flow today is:
 
@@ -66,6 +68,18 @@ That command:
 - classifies them with the built-in management reporting policy pack
 - writes terminal, JSON, CSV, Parquet, Markdown, and HTML report outputs
 - prints the generated HTML report path when `--open-report` is set
+
+## What The HTML Report Looks Like
+
+The generated `summary.html` is meant to make the reviewability problem tangible: it shows what was compressed into each `WorkUnit`, what still needs judgment, and what the run cost.
+
+Builder-demo artifact view:
+
+![Builder demo artifact screenshot](docs/assets/workledger-demo-screenshot.png)
+
+Generated HTML report view:
+
+![Generated HTML report screenshot](docs/assets/workledger-html-report-screenshot.png)
 
 If you want the smallest Python example instead of the full CLI flow:
 ```bash
@@ -199,7 +213,6 @@ Implemented today:
 Planned or explicitly not live yet:
 
 - more public dataset adapters such as `smolagents/codeagent-traces`
-- package distribution on PyPI
 - stable interfaces; the repo is still marked alpha
 
 ## Developer Surface
@@ -229,7 +242,7 @@ make test
 make docs
 ```
 
-PyPI is not live for this release, so installation is source-first from this repository.
+Tagged releases now build artifacts and publish `workledger` to PyPI via trusted publishing. If `pip install workledger` is not available yet, use the source install path from this repository until the first publish completes.
 
 ![open traces before and after](docs/assets/open-traces-before-after.svg)
 

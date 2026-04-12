@@ -5,13 +5,23 @@
 - Python 3.11+
 - [`uv`](https://docs.astral.sh/uv/getting-started/installation/)
 
+## PyPI Install
+
+When the tagged release publish has completed, install the package with:
+
+```bash
+python -m pip install workledger
+```
+
+## Source Install
+
+If you are working from the repository directly or the package is not visible on PyPI yet, use:
+
 ```bash
 git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
 ```
-
-PyPI is not published for this release. Do not advertise `pip install workledger` until the package actually exists and matches the source docs.
 
 If you want to initialize an empty local project instead of running a demo first:
 

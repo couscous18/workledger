@@ -1,6 +1,6 @@
 # Getting Started
 
-`workledger` is source-first for v0.1.0. The easiest way to understand the repo is to run a local end-to-end demo, then optionally try the supported public-trace adapters.
+`workledger` is installable as `workledger` on PyPI once the tagged release publish completes. The easiest way to understand the repo is to run a local end-to-end demo, then optionally try the supported public-trace adapters.
 
 In plain English: the goal is to turn raw AI trace data into a smaller set of work items a person can inspect, review, and report on.
 
@@ -11,13 +11,19 @@ In plain English: the goal is to turn raw AI trace data into a smaller set of wo
 
 ## Install
 
+If the package is already visible on PyPI:
+
+```bash
+python -m pip install workledger
+```
+
+If you are working from the repository directly or the first publish has not completed yet:
+
 ```bash
 git clone https://github.com/couscous18/workledger.git
 cd workledger
 uv sync --all-extras
 ```
-
-PyPI is not live for this release. Install from source from this repository.
 
 ## Recommended First Run: Local Coding Demo
 
