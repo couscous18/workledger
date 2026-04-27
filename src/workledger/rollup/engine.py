@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass, field
+from hashlib import sha256
 
 from workledger.models import EvidenceRef, ObservationSpan, SpanKind, WorkUnit
 from workledger.rollup.features import (
@@ -19,6 +20,7 @@ from workledger.rollup.features import (
     merge_facets,
     summarize_sources,
 )
+from workledger.utils.ids import stable_id
 
 
 @dataclass(slots=True)
@@ -73,6 +75,8 @@ class RollupEngine:
 
     def _build_work_unit(self, group_key: str, spans: list[ObservationSpan]) -> WorkUnit:
         sorted_spans = sorted(spans, key=lambda item: item.start_time)
+        trace_ids = sorted({span.trace_id for span in sorted_spans})
+        source_span_ids = [span.span_id for span in sorted_spans]
         start_time = sorted_spans[0].start_time
         end_time = max(span.end_time for span in sorted_spans)
         review_state = infer_review_state(sorted_spans)
@@ -82,7 +86,7 @@ class RollupEngine:
         outputs = infer_artifacts(sorted_spans, "output_artifacts")
         inputs = infer_artifacts(sorted_spans, "input_artifacts")
         score = importance_score(sorted_spans)
-        evidence = self._build_evidence(sorted_spans, outputs)
+        evidence = self._build_evidence(group_key, sorted_spans, outputs)
         material_spans = [
             span for span in sorted_spans if span.span_kind not in SUPPRESSED_SPAN_KINDS
         ]
@@ -96,6 +100,7 @@ class RollupEngine:
             }
         )
         return WorkUnit(
+            work_unit_id=stable_id("wu", group_key, ",".join(trace_ids), ",".join(source_span_ids)),
             kind=infer_kind(sorted_spans),
             title=title,
             summary=summary,
@@ -119,20 +124,30 @@ class RollupEngine:
             allocated_cost=round(direct_cost * self.config.allocated_cost_multiplier, 6),
             evidence_bundle=evidence,
             lineage_refs=[f"trace:{sorted_spans[0].trace_id}", f"group:{group_key}"],
-            source_span_ids=[span.span_id for span in sorted_spans],
+            source_span_ids=source_span_ids,
             compression_ratio=compression_ratio,
             labels=labels,
             facets=merge_facets(sorted_spans),
         )
 
     def _build_evidence(
-        self, spans: list[ObservationSpan], outputs: list[str]
+        self, group_key: str, spans: list[ObservationSpan], outputs: list[str]
     ) -> list[EvidenceRef]:
+        source_span_ids = [span.span_id for span in spans]
+        trace_ids = sorted({span.trace_id for span in spans})
         evidence: list[EvidenceRef] = [
             EvidenceRef(
+                evidence_id=stable_id(
+                    "ev",
+                    "trace_group",
+                    group_key,
+                    ",".join(trace_ids),
+                    ",".join(source_span_ids),
+                ),
                 evidence_kind="trace_group",
                 preview=f"{len(spans)} spans grouped into one work unit",
                 source_system="workledger",
+                digest=_digest("trace_group", group_key, trace_ids, source_span_ids),
                 attributes={"span_ids": [span.span_id for span in spans]},
             )
         ]
@@ -140,18 +155,32 @@ class RollupEngine:
             for output in outputs:
                 evidence.append(
                     EvidenceRef(
+                        evidence_id=stable_id("ev", "output_artifact", group_key, output),
                         evidence_kind="output_artifact",
                         uri=output,
                         preview=output,
                         source_system="trace",
+                        digest=_digest("output_artifact", group_key, output),
                     )
                 )
         if any(span.span_kind == SpanKind.REVIEW for span in spans):
             evidence.append(
                 EvidenceRef(
+                    evidence_id=stable_id(
+                        "ev",
+                        "human_review",
+                        group_key,
+                        ",".join(trace_ids),
+                        ",".join(source_span_ids),
+                    ),
                     evidence_kind="human_review",
                     preview="Human review span observed",
                     source_system="trace",
+                    digest=_digest("human_review", group_key, trace_ids, source_span_ids),
                 )
             )
         return evidence
+
+
+def _digest(*parts: object) -> str:
+    return sha256("::".join(str(part) for part in parts).encode("utf-8")).hexdigest()

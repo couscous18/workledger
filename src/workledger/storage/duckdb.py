@@ -51,6 +51,8 @@ class DuckDBStore:
         for statement in SCHEMA_SQL:
             self.connection.execute(statement)
         self._ensure_json_column("observation_spans", "token_taxes_json", "[]")
+        self._ensure_boolean_column("observation_spans", "masked", default=False)
+        self._ensure_boolean_column("observation_spans", "redaction_applied", default=False)
 
     def close(self) -> None:
         self.connection.close()
@@ -91,6 +93,26 @@ class DuckDBStore:
             f"alter table {table} add column {column} json default '{safe_default}'"
         )
 
+    def _ensure_boolean_column(self, table: str, column: str, *, default: bool) -> None:
+        self._validate_table_name(table)
+        columns = {
+            row[0]
+            for row in self.connection.execute(
+                """
+                select column_name
+                from information_schema.columns
+                where table_name = ?
+                """,
+                [table],
+            ).fetchall()
+        }
+        if column in columns:
+            return
+        default_sql = "true" if default else "false"
+        self.connection.execute(
+            f"alter table {table} add column {column} boolean default {default_sql}"
+        )
+
     def _replace_many(
         self, table: str, columns: list[str], rows: Iterable[tuple[Any, ...]]
     ) -> None:
@@ -126,6 +148,8 @@ class DuckDBStore:
                 "direct_cost",
                 "status",
                 "work_unit_key",
+                "masked",
+                "redaction_applied",
                 "attributes_json",
                 "facets_json",
                 "raw_payload_ref",
@@ -151,6 +175,8 @@ class DuckDBStore:
                     span.direct_cost,
                     span.status,
                     span.work_unit_key,
+                    span.masked,
+                    span.redaction_applied,
                     json.dumps(span.attributes),
                     json.dumps(span.facets),
                     span.raw_payload_ref,
@@ -428,7 +454,8 @@ class DuckDBStore:
             select
               observation_id, source_kind, trace_id, span_id, parent_span_id, span_kind, name, start_time,
               end_time, model_name, provider, tool_name, token_input, token_output, token_taxes_json,
-              direct_cost, status, attributes_json, raw_payload_ref, work_unit_key, facets_json
+              direct_cost, status, attributes_json, raw_payload_ref, work_unit_key, facets_json,
+              masked, redaction_applied
             from observation_spans
             order by start_time
             """
@@ -457,6 +484,8 @@ class DuckDBStore:
                     "raw_payload_ref": row[18],
                     "work_unit_key": row[19],
                     "facets": json.loads(row[20]),
+                    "masked": row[21],
+                    "redaction_applied": row[22],
                 }
             )
             for row in rows

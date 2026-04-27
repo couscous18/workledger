@@ -1,9 +1,12 @@
 from pathlib import Path
 
+import duckdb
+
 from workledger import WorkledgerConfig, WorkledgerPipeline
 from workledger.demo import write_demo_file
 from workledger.models import ObservationSpan, SourceKind, SpanKind
 from workledger.review import apply_override
+from workledger.storage import DuckDBStore
 
 
 def test_end_to_end_pipeline(tmp_path: Path) -> None:
@@ -117,3 +120,100 @@ def test_observation_span_token_taxes_round_trip_in_storage(tmp_path: Path) -> N
     assert len(stored) == 1
     assert stored[0].token_taxes[0].jurisdiction == "US-NY"
     assert stored[0].token_taxes[0].included_in_direct_cost is False
+
+
+def test_observation_span_redaction_provenance_round_trip_in_storage(tmp_path: Path) -> None:
+    config = WorkledgerConfig.from_project_dir(tmp_path / "project")
+    pipeline = WorkledgerPipeline(config)
+    span = ObservationSpan(
+        source_kind=SourceKind.SDK,
+        trace_id="trace_redacted",
+        span_id="span_redacted",
+        span_kind=SpanKind.LLM,
+        name="Generate redacted completion",
+        start_time="2026-04-06T12:00:00+00:00",
+        end_time="2026-04-06T12:00:05+00:00",
+        masked=True,
+        redaction_applied=True,
+    )
+
+    pipeline.store.save_observation_spans([span])
+    stored = pipeline.store.fetch_spans()
+    pipeline.close()
+
+    assert len(stored) == 1
+    assert stored[0].masked is True
+    assert stored[0].redaction_applied is True
+
+
+def test_storage_bootstrap_adds_redaction_columns_to_existing_database(tmp_path: Path) -> None:
+    database_path = tmp_path / "legacy.duckdb"
+    connection = duckdb.connect(str(database_path))
+    connection.execute(
+        """
+        create table observation_spans (
+          observation_id varchar primary key,
+          trace_id varchar not null,
+          span_id varchar not null,
+          parent_span_id varchar,
+          source_kind varchar not null,
+          span_kind varchar not null,
+          name varchar not null,
+          start_time timestamp not null,
+          end_time timestamp not null,
+          duration_ms bigint not null,
+          model_name varchar,
+          provider varchar,
+          tool_name varchar,
+          token_input bigint not null,
+          token_output bigint not null,
+          token_taxes_json json not null,
+          direct_cost double not null,
+          status varchar not null,
+          work_unit_key varchar,
+          attributes_json json not null,
+          facets_json json not null,
+          raw_payload_ref varchar
+        )
+        """
+    )
+    connection.close()
+
+    store = DuckDBStore(database_path)
+    columns = {
+        row[0]
+        for row in store.connection.execute(
+            """
+            select column_name
+            from information_schema.columns
+            where table_name = 'observation_spans'
+            """
+        ).fetchall()
+    }
+    store.close()
+
+    assert "masked" in columns
+    assert "redaction_applied" in columns
+
+
+def test_explain_returns_attribution_graph_for_work_unit_and_classification(tmp_path: Path) -> None:
+    config = WorkledgerConfig.from_project_dir(tmp_path / "project")
+    pipeline = WorkledgerPipeline(config)
+    input_path = write_demo_file("capex", config.raw_events_dir / "capex.jsonl")
+    pipeline.ingest(input_path)
+    work_units = pipeline.rollup()
+    traces = pipeline.classify(config.policies_dir / "software_capex_review_v1.yaml")
+
+    by_work_unit = pipeline.explain(work_units[0].work_unit_id)
+    by_classification = pipeline.explain(traces[0].classification_id)
+    pipeline.close()
+
+    assert by_work_unit["work_unit"]["work_unit_id"] == work_units[0].work_unit_id
+    assert by_work_unit["classifications"]
+    assert by_work_unit["source_spans"]
+    assert by_work_unit["evidence_refs"]
+    assert by_work_unit["lineage_refs"] == work_units[0].lineage_refs
+    assert "attributes" not in by_work_unit["source_spans"][0]
+    assert {"masked", "redaction_applied"} <= set(by_work_unit["source_spans"][0])
+    assert by_classification["work_unit"]["work_unit_id"] == traces[0].work_unit_id
+    assert by_classification["source_spans"]

@@ -153,6 +153,13 @@ def create_app(config: WorkledgerConfig | None = None) -> FastAPI:
             raise HTTPException(status_code=404, detail="classification not found")
         return trace.model_dump(mode="json")
 
+    @protected.get("/explain/{identifier}", dependencies=[Depends(verify_api_key)])
+    def explain(request: Request, identifier: str) -> dict[str, Any]:
+        try:
+            return pipeline(request).explain(identifier)
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
     @protected.get("/decisions", dependencies=[Depends(verify_api_key)])
     def list_decisions(request: Request) -> list[dict[str, Any]]:
         return [
