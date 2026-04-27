@@ -179,6 +179,16 @@ class RollupEngine:
                     digest=_digest("human_review", group_key, trace_ids, source_span_ids),
                 )
             )
+        for span in spans:
+            if span.raw_payload_ref:
+                evidence.append(
+                    EvidenceRef(
+                        evidence_kind="source_trace_ref",
+                        uri=span.raw_payload_ref,
+                        preview=span.name,
+                        source_system=str(span.source_kind),
+                    )
+                )
         return evidence
 
 

@@ -1,28 +1,38 @@
 # Adapters & Integrations
 
-V1 supports normalization from:
+Adapters and normalizers convert source payloads into `ObservationSpan`.
 
-- OpenTelemetry-like span JSON
-- OpenInference-like span JSON
-- CloudEvents JSON
-- raw JSONL batches
-- SDK-emitted canonical span payloads
+## Local Input Shapes Supported By `wl ingest`
 
-Adapters normalize into `ObservationSpan` before rollup and policy evaluation.
+`wl ingest` accepts `.json` and `.jsonl`. The normalizer currently detects these payload families:
 
-## JSONL
+- canonical SDK-shaped observation events
+- OpenInference-like payloads
+- OTEL-style JSON spans
+- CloudEvents whose `data` contains canonical SDK or OpenInference-like payloads
 
-Each line should be a single event object. Malformed lines are skipped and reported during ingest instead of crashing the full batch.
+## Hugging Face Adapters Implemented Today
 
-## OpenInference-Like
+- `gaia`
+  - targets message-style rows such as `smolagents/gaia-traces`
+  - emits one root agent span plus per-message spans
+  - sets `work_unit_key` so one dataset row rolls into one candidate work unit
+- `smoltrace`
+  - targets trace-and-span rows such as `kshitijthakkar/smoltrace-traces-20260130_053009`
+  - preserves span hierarchy, duration, cost, and row lineage
+  - stores dataset metadata under `facets["hf"]` and `facets["smoltrace"]`
 
-Provide `trace_id`, `span_id`, `start_time`, `end_time`, and optional token and cost fields.
+## Adapter Design
 
-## OpenTelemetry-Like
+The adapter seam in code is intentionally small:
 
-Provide `traceId`, `spanId`, timing fields, and attributes such as `llm.model_name`, `llm.token_count.prompt`, and `llm.cost.usd`.
+- choose or infer the source shape
+- map source rows into one or more `ObservationSpan`
+- preserve lineage in `raw_payload_ref`
+- attach source-specific metadata in namespaced `facets`
+- optionally set `work_unit_key` when the source already exposes a good rollup boundary
 
-## SDK Events
+## Hugging Face Lineage
 
 If you control the instrumentation code, canonical SDK-shaped events are the simplest path because they map directly into WorkLedger’s normalized schema.
 

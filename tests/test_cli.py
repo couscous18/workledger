@@ -65,3 +65,12 @@ def test_compare_costs_cli_renders_summary(tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert "comparative economics" in result.stdout.lower()
     assert "open hosted" in result.stdout.lower()
+
+
+def test_demo_cli_accepts_open_traces_alias(tmp_path: Path) -> None:
+    project_dir = tmp_path / "open-traces"
+
+    result = runner.invoke(app, ["demo", "open-traces", "--project-dir", str(project_dir)])
+
+    assert result.exit_code == 0
+    assert "Demo open-traces complete." in result.stdout

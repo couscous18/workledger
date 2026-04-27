@@ -1,6 +1,6 @@
 site_name: workledger
 site_url: https://couscous18.github.io/workledger/
-site_description: Agent work ledger for AI systems
+site_description: Open trace-to-work layer for AI systems
 repo_url: https://github.com/couscous18/workledger
 repo_name: couscous18/workledger
 edit_uri: edit/main/docs/
@@ -33,23 +33,26 @@ theme:
 
 nav:
   - Home: index.md
-  - Builder Demo: builder-demo.md
-  - Release Notes (0.1.0): releases/v0.1.0.md
   - Getting Started: getting-started.md
   - Installation: installation.md
-  - How It Works: how-it-works.md
   - CLI Reference: cli.md
+  - How It Works: how-it-works.md
   - Data Model: data-model.md
-  - Policy Packs: policy-packs.md
-  - Adapters & Integrations: adapters.md
-  - Framework Examples: framework-examples.md
   - Reporting: reporting.md
-  - Deployment: deployment.md
+  - Adapters & Integrations: adapters.md
+  - Public Traces Demo: public-traces-demo.md
+  - Open Traces: open-traces.md
+  - Trace To Work: trace-to-work.md
+  - FAQ: faq.md
+  - Builder Demo: builder-demo.md
+  - Policy Packs: policy-packs.md
+  - Framework Examples: framework-examples.md
   - Comparative Economics: comparative-economics.md
   - Software CapEx Review: software-capex.md
+  - Deployment: deployment.md
   - Schema Specification: schema-spec.md
   - Contributing Policies: contributing-policies.md
-  - FAQ: faq.md
+  - Release Notes (0.1.0): releases/v0.1.0.md
 
 plugins:
   - search

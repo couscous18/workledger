@@ -9,6 +9,7 @@ class SourceKind(StrEnum):
     JSONL = "jsonl"
     CLOUDEVENT = "cloudevent"
     SDK = "sdk"
+    HUGGINGFACE = "huggingface"
     MANUAL = "manual"
 
 

@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   publish:
@@ -35,6 +36,15 @@ jobs:
       - name: Build distribution artifacts
         run: uv build
 
+      - name: Check distribution metadata
+        run: uvx twine check dist/*
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          skip-existing: true
+
       - name: Resolve release metadata
         id: metadata
         run: |
@@ -54,7 +64,15 @@ jobs:
           tag="${{ steps.metadata.outputs.tag }}"
           notes_file="${{ steps.metadata.outputs.notes_file }}"
 
-          if [ -f "${notes_file}" ]; then
+          if gh release view "${tag}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload "${tag}" dist/* --repo "${GITHUB_REPOSITORY}" --clobber
+            if [ -f "${notes_file}" ]; then
+              gh release edit "${tag}" \
+                --repo "${GITHUB_REPOSITORY}" \
+                --title "workledger ${tag}" \
+                --notes-file "${notes_file}"
+            fi
+          elif [ -f "${notes_file}" ]; then
             gh release create "${tag}" dist/* \
               --repo "${GITHUB_REPOSITORY}" \
               --title "workledger ${tag}" \

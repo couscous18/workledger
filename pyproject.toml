@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "workledger"
 version = "0.1.0"
-description = "Turn AI traces into understandable units of work."
+description = "Open trace-to-work layer for AI systems."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -15,10 +15,12 @@ authors = [
 keywords = [
   "ai",
   "ai-agents",
+  "trace-to-work",
   "work-intelligence",
   "cost-attribution",
   "observability",
   "opentelemetry",
+  "openinference",
   "llmops",
   "duckdb",
 ]
@@ -33,6 +35,8 @@ classifiers = [
 ]
 
 dependencies = [
+  "cloudevents>=1.11.0",
+  "datasets>=3.2.0",
   "duckdb>=1.1.3",
   "fastapi>=0.115.0",
   "pydantic>=2.9.0",
@@ -70,6 +74,20 @@ workledger-server = "workledger_server.app:run"
 [tool.hatch.build.targets.wheel]
 packages = ["src/workledger", "src/workledger_observe", "src/workledger_server"]
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.devcontainer",
+  "/.dockerignore",
+  "/.github",
+  "/.gitpod.yml",
+  "/.pre-commit-config.yaml",
+  "/.uv-cache",
+  "/build",
+  "/dist",
+  "/docs/assets/*.html",
+  "/site",
+]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
@@ -89,7 +107,7 @@ warn_unused_configs = true
 plugins = []
 
 [[tool.mypy.overrides]]
-module = ["yaml"]
+module = ["yaml", "datasets"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

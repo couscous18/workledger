@@ -1,6 +1,6 @@
 # Reporting
 
-The default report bundle writes:
+`wl report` writes a fixed report bundle into the project `reports/` directory:
 
 - `summary.json`
 - `cost_by_work_category.csv`
@@ -8,14 +8,50 @@ The default report bundle writes:
 - `summary.md`
 - `summary.html`
 
-The HTML report is intended to be screenshot-friendly for internal review, demos, and shareable proof that many traces became a few understandable work units.
+The report engine reads from the local DuckDB store. It can render useful output after ingest and rollup alone, but some sections only populate after classification.
 
-Common sections include:
+## Sections The Reports Generate Today
 
-- cost by policy outcome
-- pending review queue
-- top ambiguous items
+Always available when data exists:
+
+- dataset context
+- raw trace excerpt
+- normalized observations
+- rolled work units
+- review-needed work
+
+Available after `wl classify` has produced `ClassificationTrace` rows:
+
+- pending review queue from policy classification
+- ambiguity summaries
 - compression proof point
-- low-trust high-cost outputs
+- top material work units
+- cost by policy outcome
+- cost by work category
+- low-trust high-cost items
 
-When economics comparison is enabled, the report bundle also includes a comparative economics section that contrasts observed spend with transparent open-hosted and self-hosted assumptions.
+Available only when `--include-economics` is passed:
+
+- comparative economics
+
+## Other Output Surfaces
+
+- `wl report` also renders a terminal summary
+- `wl export` can export any known table as CSV, Parquet, or JSON
+- `wl explain` prints a stored work unit or classification as JSON
+
+## What The Reports Make Legible
+
+The current bundle is designed to show:
+
+- how raw trace records were normalized into `ObservationSpan`
+- how many observations were rolled into each `WorkUnit`
+- which items still require review
+- where blended cost is accumulating by category or policy outcome
+- which costly items are still low-trust
+
+`summary.json` contains the full structured summary, including totals, compression story, queue data, and cost slices.
+`classification_traces.parquet` preserves the downstream attribution layer for local analysis.
+`summary.md` and `summary.html` present the same narrative in human-readable form.
+
+`classification_traces.parquet` is still written even if you have not classified anything yet; in that case it simply reflects the empty downstream layer.
