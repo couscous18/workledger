@@ -20,3 +20,31 @@ def test_rollup_captures_supporting_lineage_and_outputs() -> None:
     assert work_unit.evidence_bundle
     assert work_unit.output_artifact_refs
     assert work_unit.compression_ratio >= 1
+
+
+def test_rollup_ids_and_evidence_are_deterministic() -> None:
+    spans = [normalize_event(event) for event in coding_demo_events()]
+
+    first = RollupEngine().rollup(spans)
+    second = RollupEngine().rollup(spans)
+
+    assert [item.work_unit_id for item in first] == [item.work_unit_id for item in second]
+    assert [
+        [evidence.evidence_id for evidence in item.evidence_bundle]
+        for item in first
+    ] == [
+        [evidence.evidence_id for evidence in item.evidence_bundle]
+        for item in second
+    ]
+    assert [
+        [evidence.digest for evidence in item.evidence_bundle]
+        for item in first
+    ] == [
+        [evidence.digest for evidence in item.evidence_bundle]
+        for item in second
+    ]
+    assert all(
+        evidence.digest
+        for work_unit in first
+        for evidence in work_unit.evidence_bundle
+    )

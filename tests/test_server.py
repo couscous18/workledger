@@ -55,6 +55,32 @@ def test_ingest_spans_accepts_canonical_spans_without_renormalizing(tmp_path: Pa
     assert spans[0].source_kind == "manual"
 
 
+def test_explain_endpoint_returns_attribution_graph(tmp_path: Path) -> None:
+    config = WorkledgerConfig.from_project_dir(tmp_path / "api")
+    config.allow_unauthenticated_api = True
+    with TestClient(create_app(config)) as client:
+        ingest = client.post("/ingest/events", json=demo_events("capex"))
+        assert ingest.status_code == 200
+        rollup = client.post("/rollup")
+        assert rollup.status_code == 200
+        classify = client.post(
+            "/classify",
+            params={"policy": "software_capex_review_v1"},
+        )
+        assert classify.status_code == 200
+
+        classification_id = classify.json()[0]["classification_id"]
+        response = client.get(f"/explain/{classification_id}")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["work_unit"]["work_unit_id"] == classify.json()[0]["work_unit_id"]
+    assert payload["classifications"]
+    assert payload["source_spans"]
+    assert payload["evidence_refs"]
+    assert payload["lineage_refs"]
+
+
 def test_server_requires_api_key_when_configured(tmp_path: Path) -> None:
     config = WorkledgerConfig.from_project_dir(tmp_path / "api")
     config.api_key = "secret"

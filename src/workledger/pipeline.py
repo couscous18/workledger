@@ -160,19 +160,76 @@ class WorkledgerPipeline:
     def explain(self, identifier: str) -> dict[str, Any]:
         work_unit = self.store.get_work_unit(identifier)
         if work_unit:
-            related = [
-                trace
-                for trace in self.store.list_classifications()
-                if trace.work_unit_id == work_unit.work_unit_id
-            ]
-            return {
-                "work_unit": work_unit.model_dump(mode="json"),
-                "classifications": [trace.model_dump(mode="json") for trace in related],
-            }
+            return self._explain_work_unit(work_unit)
         trace = self.store.get_classification(identifier)
         if trace:
-            return {"classification": trace.model_dump(mode="json")}
+            work_unit = self.store.get_work_unit(trace.work_unit_id)
+            if work_unit is None:
+                return {
+                    "work_unit": None,
+                    "classifications": [trace.model_dump(mode="json")],
+                    "source_spans": [],
+                    "evidence_refs": [],
+                    "lineage_refs": [],
+                }
+            return self._explain_work_unit(work_unit)
         raise ValueError(f"unknown work unit or classification: {identifier}")
+
+    def _explain_work_unit(self, work_unit: WorkUnit) -> dict[str, Any]:
+        related = [
+            trace
+            for trace in self.store.list_classifications()
+            if trace.work_unit_id == work_unit.work_unit_id
+        ]
+        source_spans = self._compact_source_spans(work_unit.source_span_ids)
+        return {
+            "work_unit": work_unit.model_dump(mode="json"),
+            "classifications": [trace.model_dump(mode="json") for trace in related],
+            "source_spans": source_spans,
+            "evidence_refs": [item.model_dump(mode="json") for item in work_unit.evidence_bundle],
+            "lineage_refs": work_unit.lineage_refs,
+        }
+
+    def _compact_source_spans(self, source_span_ids: list[str]) -> list[dict[str, Any]]:
+        spans_by_id = {span.span_id: span for span in self.store.fetch_spans()}
+        compact_spans: list[dict[str, Any]] = []
+        provenance_keys = ("actor", "project", "team", "cost_center", "labels")
+        for span_id in source_span_ids:
+            span = spans_by_id.get(span_id)
+            if span is None:
+                continue
+            provenance = {
+                key: span.attributes[key]
+                for key in provenance_keys
+                if key in span.attributes
+            }
+            compact_spans.append(
+                {
+                    "observation_id": span.observation_id,
+                    "trace_id": span.trace_id,
+                    "span_id": span.span_id,
+                    "parent_span_id": span.parent_span_id,
+                    "source_kind": span.source_kind,
+                    "span_kind": span.span_kind,
+                    "name": span.name,
+                    "start_time": span.start_time.isoformat(),
+                    "end_time": span.end_time.isoformat(),
+                    "duration_ms": span.duration_ms,
+                    "model_name": span.model_name,
+                    "provider": span.provider,
+                    "tool_name": span.tool_name,
+                    "token_input": span.token_input,
+                    "token_output": span.token_output,
+                    "direct_cost": span.direct_cost,
+                    "status": span.status,
+                    "work_unit_key": span.work_unit_key,
+                    "masked": span.masked,
+                    "redaction_applied": span.redaction_applied,
+                    "raw_payload_ref": span.raw_payload_ref,
+                    "provenance": provenance,
+                }
+            )
+        return compact_spans
 
     def export(self, table: str, fmt: str, destination: Path) -> Path:
         return self.store.export_table(table, destination, fmt)

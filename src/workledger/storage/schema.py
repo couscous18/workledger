@@ -20,6 +20,8 @@ SCHEMA_SQL = [
       direct_cost double not null,
       status varchar not null,
       work_unit_key varchar,
+      masked boolean not null default false,
+      redaction_applied boolean not null default false,
       attributes_json json not null,
       facets_json json not null,
       raw_payload_ref varchar
